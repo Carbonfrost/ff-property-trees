@@ -1,0 +1,39 @@
+﻿<items>
+    <alpha1 />
+    
+    <alpha2
+        xmlns:shared="http://ns.carbonfrost.com/2008/commons/sharedruntime"
+        a  = "true"
+        aa = ""
+        b  = "0"
+        bb = "0"
+        d  = "g"
+        e  = "3/30/2011 1:50 AM"
+        f  = "10.5000"
+        g  = "10.5"
+        h  = "256"
+        i  = "1024"
+        j  = "102410241024"
+        k  = "-120"
+        l  = "NaN"
+        m  = "Carbonfrost F5 Project"
+        n  = "65535"
+        o  = "6553620"
+        p  = "6553620655362"
+        q  = "http://carbonfrost.com"
+        r  = "4.12:0:30.5"
+        s  = "{BF972F0A-CB10-441B-9D25-3D6DEB9065D1}"
+        t  = "4/1/2011 12:11:01 AM -04:00"
+        u  = "shared:Glob"
+    />
+    
+    <alpha3 />
+    
+    <alpha4
+        u  = "shared:Glob"></alpha4>
+    
+    <alpha5
+        c  = "48E61C91C77145F7823EE333168520273AC16D871AEC4F5E87C5B24BA15EDAF151535BCA3B3248EEB60D77A0FBEEADE02F6EE59B29074876963464E048598DCB75717B38E1F84E41984AB0520A0425FECD87CD8C6CF6425E9AAFFE288051D303EDB6BFE68C004E9D86C33184684AB3FCBCF52FDEB337449FA22C2C359C042174"
+    />
+
+</items>

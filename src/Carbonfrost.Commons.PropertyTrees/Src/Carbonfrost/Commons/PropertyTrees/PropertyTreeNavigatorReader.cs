@@ -1,0 +1,90 @@
+//
+// - PropertyTreeNavigatorReader.cs -
+//
+// Copyright 2012 Carbonfrost Systems, Inc. (http://carbonfrost.com)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+using System;
+using Carbonfrost.Commons.PropertyTrees.Schema;
+
+namespace Carbonfrost.Commons.PropertyTrees {
+
+    class PropertyTreeNavigatorReader : PropertyTreeReader {
+
+        private readonly PropertyTreeNavigator nav;
+
+        public PropertyTreeNavigatorReader(PropertyTreeNavigator nav) {
+            this.nav = nav;
+        }
+
+        public override object Value {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override ReadState ReadState {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override bool Read() {
+            throw new NotImplementedException();
+        }
+
+        public override int Position {
+            get {
+                return nav.Position;
+            }
+        }
+
+        public override PropertyNodeType NodeType {
+            get {
+                return nav.NodeType;
+            }
+        }
+
+        public override string Namespace {
+            get {
+                return nav.Namespace;
+            }
+        }
+
+        public override string Name {
+            get {
+                return nav.Name;
+            }
+        }
+
+        public override int Depth {
+            get {
+                return nav.Depth;
+            }
+        }
+
+        public override PropertyNodeDefinition Definition {
+            get {
+                return nav.Definition;
+            }
+        }
+
+        public override bool HasChildren {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+    }
+}

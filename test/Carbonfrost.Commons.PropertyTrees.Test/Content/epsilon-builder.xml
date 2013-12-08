@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<epsilon
+    a  = "256"
+    b  = "2.5:05:05.200"
+    c  = "2256.231250002"
+    d  = "293680235"
+>
+    <!-- Presence of this comment should not affect binding -->
+    <?L Presence of this preprocessor instruction should not either ?>
+    <e
+        type = "Prototypes.EpsilonExtendedBuilder, Carbonfrost.Commons.PropertyTrees.Test"
+        a  = "1256"
+        b  = "12.5:05:05.200"
+        c  = "12256.231250002"
+        d  = "1293680235"
+        f  = "2011-05-12 8:45AM"
+    >
+    </e>
+</epsilon>

@@ -1,0 +1,18 @@
+﻿<items>
+    
+    <lm>
+        
+        <alpha />
+        <alpha />
+        
+        <alpha name = "colon">
+            
+            <alpha name = "comma" />
+        
+        </alpha>
+        
+        <alpha name = "solidus" />
+    
+    </lm>
+
+</items>

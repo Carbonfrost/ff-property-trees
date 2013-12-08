@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<omicron>
+    <alpha
+        a  = "true"
+        aa = ""
+        b  = "0"
+        bb = "0"
+        d  = "g"
+        e  = "3/30/2011 1:50 AM" />
+    
+    <beta
+        c  = "http://carbonfrost.com"
+        d  = "Generic text">
+        <a
+            a  = "true" />
+    </beta>
+
+    <gamma 
+        a = "en-US" />
+</omicron>

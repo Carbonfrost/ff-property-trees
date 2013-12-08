@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<phi>
+
+    <!-- This add method is supplied because Phi implements IAddChild<Gamma> -->
+    <gamma-child a="1033" />
+
+<!-- This add method is supplied because Phi implements IAddChild<d> -->
+
+</phi>

@@ -1,0 +1,65 @@
+﻿<?xml version="1.0"?>
+<!--
+
+- Build -
+
+ Copyright 2013 Carbonfrost Systems, Inc. (http://carbonfrost.com)
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+-->
+<build
+  xmlns="http://ns.carbonfrost.com/2013/commons/build/"
+  defaultTarget="release">
+  <targets>
+
+    <target name="release">
+      <file target="src/Carbonfrost.Commons.PropertyTrees/Automation/SR.g.resources">
+        <srgen namespace="Carbonfrost.Commons.PropertyTrees.Resources">
+          <include name="src/Carbonfrost.Commons.PropertyTrees/Automation/SR.properties" />
+        </srgen>
+      </file>
+
+      <file target="src/Carbonfrost.Commons.PropertyTrees/Automation/PrivateKeyAttribute.g.cs">
+        <privateKeyAttributeGenerator input="F5NonCommercial.snk"/>
+      </file>
+
+      <file target="src/Carbonfrost.Commons.PropertyTrees/Automation/AssemblyInfo.g.cs">
+        <versionAttributeGenerator></versionAttributeGenerator>
+      </file>      
+      
+      <assembly 
+        privateKey="F5NonCommercial.snk"
+        target="bin/net40/debug/x86/Carbonfrost.Commons.PropertyTrees.dll">
+        <sources>
+          <include name="src/Carbonfrost.Commons.PropertyTrees/**/*.cs" />
+        </sources>
+        <embeddedResources>
+          <include name="src/Carbonfrost.Commons.PropertyTrees/**/*.resources" />
+        </embeddedResources>
+        <references>
+          <reference aliases="global">
+            <assembly name="mscorlib, Version=4.0" />
+            <assembly name="System" />
+            <assembly name="System.Core" />
+            <assembly name="System.XML" />
+             <include name="lib/*.dll" />
+          </reference>
+        </references>
+      </assembly>
+
+    </target>
+
+  </targets>
+
+</build>

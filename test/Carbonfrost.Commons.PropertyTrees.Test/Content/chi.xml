@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<chi
+    xmlns:pt="http://ns.carbonfrost.com/2010/commons/propertytrees"
+    a="50"
+>
+    <pt:property
+        name="b"
+        value="true"
+        browsable="true"
+        category="category"
+        defaultValue="true"
+        propertyType="pt:boolean"
+        readOnly="false"
+        fullName="chi.b"
+        enabled="true" />
+    
+    <c a="50" b="true" pt:readOnly="true" pt:browsable="true">
+    </c>
+</chi>
+

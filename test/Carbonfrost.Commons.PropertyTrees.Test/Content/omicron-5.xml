@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<omicron>
+
+    <!-- Dictionary binding -->
+    <a   b  = "0"
+         bb = "0"
+         d  = "g"
+         e  = "3/30/2011 1:50 AM"
+         f  = "10.5000"    />
+
+</omicron>
