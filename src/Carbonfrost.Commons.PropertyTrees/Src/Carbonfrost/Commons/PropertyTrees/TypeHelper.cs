@@ -24,6 +24,7 @@ using System.Reflection;
 
 using Carbonfrost.Commons.ComponentModel;
 using Carbonfrost.Commons.Shared.Runtime;
+using Carbonfrost.Commons.PropertyTrees.Schema;
 
 namespace Carbonfrost.Commons.PropertyTrees {
 
@@ -42,6 +43,28 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 return ((ConstructorInfo) method).DeclaringType;
             else
                 return ((MethodInfo) method).ReturnType;
+        }
+
+        public static TypeConverter GetConverter(PropertyDefinition property, Type neededType) {
+            TypeConverter conv = null;
+            if (property != null)
+                conv = property.Converter;
+
+            if (conv == null)
+                conv = TypeDescriptor.GetConverter(neededType);
+
+            if (conv == null || conv is ReferenceConverter) {
+                if (neededType.IsGenericType
+                && !neededType.IsGenericTypeDefinition
+                && (neededType.GetGenericTypeDefinition() == typeof(IList<>)
+                    || neededType.GetGenericTypeDefinition() == typeof(List<>)))
+                    return ListConverter.Instance(neededType.GetGenericArguments()[0]);
+            }
+
+            if (conv is BooleanConverter)
+                return BooleanConverterExtension.Instance;
+
+            return conv;
         }
 
         public static Uri ConvertToUri(object value) {

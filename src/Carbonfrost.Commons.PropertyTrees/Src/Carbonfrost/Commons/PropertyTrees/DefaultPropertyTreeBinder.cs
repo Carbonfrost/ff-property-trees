@@ -17,9 +17,11 @@
 //
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Carbonfrost.Commons.PropertyTrees.Schema;
 using Carbonfrost.Commons.Shared;
 
@@ -51,7 +53,17 @@ namespace Carbonfrost.Commons.PropertyTrees {
         private void SetProperty(object outputValue, PropertyTreeBindingContext context, PropertyDefinition property) {
             if (context.Component != null) {
                 try {
-                    property.SetValue(context.Component, outputValue);
+                    if (property.IsReadOnly) {
+                        var current = property.GetValue(context.Component);
+
+                        IEnumerable e = outputValue as IEnumerable;
+                        if (e == null)
+                            throw new NotImplementedException();
+                        else
+                            AggregateValues(e, current);
+
+                    } else
+                        property.SetValue(context.Component, outputValue);
 
                 } catch (NullReferenceException nre) {
                     // Normally a "critical" exception, consider it a conversion error
@@ -67,6 +79,15 @@ namespace Carbonfrost.Commons.PropertyTrees {
                     context.Callback.OnConversionException(property.Name, outputValue, ex);
                 }
             }
+        }
+
+        private void AggregateValues(IEnumerable e, object component) {
+            // TODO Bind the best add method
+            // TODO Invoke AddRange if it is supported as an optimization
+            MethodInfo mi = component.GetType().GetMethod("Add");
+
+            foreach (var item in e)
+                mi.Invoke(component, new object[] { item });
         }
 
         private object BindInlineParameter(PropertyTreeBindingContext context,

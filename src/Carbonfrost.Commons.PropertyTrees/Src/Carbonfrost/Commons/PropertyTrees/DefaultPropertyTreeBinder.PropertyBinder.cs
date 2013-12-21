@@ -37,10 +37,8 @@ namespace Carbonfrost.Commons.PropertyTrees {
                     return null;
 
                 try {
-                    if (property != null)
-                        return property.Converter.ConvertFrom(value);
-                    else
-                        return TypeDescriptor.GetConverter(neededType).ConvertFrom(value);
+                    TypeConverter conv = TypeHelper.GetConverter(property, neededType);
+                    return conv.ConvertFrom(value);
 
                 } catch (Exception ex) {
                     SetLineInfo(context, navigator);

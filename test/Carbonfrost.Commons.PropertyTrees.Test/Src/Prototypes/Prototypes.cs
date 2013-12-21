@@ -295,11 +295,13 @@ namespace Prototypes {
     public class Psi {
 
         public IList<Alpha> A { get; private set; }
+        public IList<string> B { get; private set; }
 
         public Psi() {
             this.A = new List<Alpha> {
                 new Alpha { B = 47 }, new Alpha { B = 39 }, new Alpha { B = 47 }
             };
+            this.B = new List<string>();
         }
 
     }

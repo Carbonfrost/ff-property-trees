@@ -346,6 +346,18 @@ namespace Tests {
         }
 
         [Test]
+        public void bind_add_range_property() {
+            PropertyTreeReader pt = LoadContent("psi-add-range.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            Psi p = pt.Bind<Psi>(new Psi());
+            Assert.That(p.B.Count, Is.EqualTo(4));
+            Assert.That(p.B[0], Is.EqualTo("a"));
+            Assert.That(p.B[2], Is.EqualTo("c"));
+            Assert.That(p.B[3], Is.EqualTo("d"));
+        }
+
+        [Test]
         public void bind_remove_method() {
             PropertyTreeReader pt = LoadContent("psi-remove.xml");
             Assume.That(pt.Read(), Is.True);
