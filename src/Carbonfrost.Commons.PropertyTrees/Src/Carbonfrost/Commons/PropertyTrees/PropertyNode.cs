@@ -28,7 +28,7 @@ using Carbonfrost.Commons.Shared.Runtime;
 namespace Carbonfrost.Commons.PropertyTrees {
 
     public abstract partial class PropertyNode
-        : IHierarchyObject<PropertyNode>, ICloneable, INotifyPropertyChanged, IHierarchyNavigable, IPropertyNode {
+        : IHierarchyObject, ICloneable, INotifyPropertyChanged, IHierarchyNavigable, IPropertyNode {
 
         internal PropertyTree parent;
         internal IDictionary<string, string> prefixMap;
@@ -251,15 +251,6 @@ namespace Carbonfrost.Commons.PropertyTrees {
         }
 
         // IHierarchyObject implementation
-        PropertyNode IHierarchyObject<PropertyNode>.ParentObject {
-            get {
-                return this.Parent;
-            }
-            set {
-                this.Parent = (PropertyTree) value;
-            }
-        }
-
         IHierarchyObject IHierarchyObject.ParentObject {
             get {
                 return Parent;
@@ -274,6 +265,12 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
                     this.Parent = newParent;
                 }
+            }
+        }
+
+        IEnumerable<IHierarchyObject> IHierarchyObject.ChildrenObjects {
+            get {
+                return this.Children;
             }
         }
 
