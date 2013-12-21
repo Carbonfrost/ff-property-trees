@@ -1,0 +1,8 @@
+<lib>
+  <dependencies>
+    <runtime>
+      <assembly name="Carbonfrost.Commons.SharedRuntime, PublicKeyToken=d09aaf34527fe3e6" />
+      <assembly name="Carbonfrost.Commons.ComponentModel, PublicKeyToken=d09aaf34527fe3e6" />
+    </runtime>
+  </dependencies>
+</lib>

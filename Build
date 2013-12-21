@@ -24,6 +24,12 @@
   <targets>
 
     <target name="release">
+
+      <!-- Dependencies -->
+      <directory target="lib">
+        <lib source="lib/dependencies.lib.xml" />
+      </directory>
+
       <file target="src/Carbonfrost.Commons.PropertyTrees/Automation/SR.g.resources">
         <srgen namespace="Carbonfrost.Commons.PropertyTrees.Resources">
           <include name="src/Carbonfrost.Commons.PropertyTrees/Automation/SR.properties" />
