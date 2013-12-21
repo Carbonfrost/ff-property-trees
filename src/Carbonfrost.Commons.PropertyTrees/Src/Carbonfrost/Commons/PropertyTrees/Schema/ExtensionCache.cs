@@ -34,7 +34,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public static void Init(Assembly assembly) {
             if (!extensionHelper.Contains(assembly)) {
-                Console.WriteLine("Unexpected: assembly not found {0}", assembly);
             }
         }
 
