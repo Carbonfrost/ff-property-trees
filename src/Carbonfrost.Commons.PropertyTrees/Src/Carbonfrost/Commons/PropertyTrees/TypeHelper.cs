@@ -53,13 +53,17 @@ namespace Carbonfrost.Commons.PropertyTrees {
             if (conv == null)
                 conv = TypeDescriptor.GetConverter(neededType);
 
+            // On .NET, ReferenceConverter is returned
             if (conv == null || conv is ReferenceConverter) {
                 if (neededType.IsGenericType
-                && !neededType.IsGenericTypeDefinition
-                && (neededType.GetGenericTypeDefinition() == typeof(IList<>)
-                    || neededType.GetGenericTypeDefinition() == typeof(List<>)))
+                    && !neededType.IsGenericTypeDefinition
+                    && (neededType.GetGenericTypeDefinition() == typeof(IList<>)
+                        || neededType.GetGenericTypeDefinition() == typeof(List<>)))
                     return ListConverter.Instance(neededType.GetGenericArguments()[0]);
             }
+
+            if (conv is EnumConverter)
+                return EnumConverterExtension.Instance(neededType);
 
             if (conv is BooleanConverter)
                 return BooleanConverterExtension.Instance;
