@@ -169,7 +169,16 @@ namespace Carbonfrost.Commons.PropertyTrees {
             }
 
             SetLineInfo(context, nav);
-            context.Component = op.Apply(component, parent, args);
+            try {
+                context.Component = op.Apply(component, parent, args);
+            } catch (Exception ex) {
+                if (Require.IsCriticalException(ex))
+                    throw;
+
+                throw PropertyTreesFailure.RequiredPropertiesMissing(requiredMissing.ToArray(),
+                                                                     op.ToString(),
+                                                                     nav.LineNumber, nav.LinePosition);
+            }
         }
 
     }

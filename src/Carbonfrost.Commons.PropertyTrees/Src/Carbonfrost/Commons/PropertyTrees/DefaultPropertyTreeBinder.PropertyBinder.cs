@@ -20,6 +20,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 
+using Carbonfrost.Commons.Shared.Runtime;
 using Carbonfrost.Commons.PropertyTrees.Schema;
 
 namespace Carbonfrost.Commons.PropertyTrees {
@@ -32,6 +33,12 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 Type neededType = context.ComponentType;
                 PropertyDefinition property = context.Property;
                 object value = navigator.Value;
+
+                // Apply concrete classes
+                var cp = neededType.GetConcreteClass();
+                if (cp != null) {
+                    neededType = cp;
+                }
 
                 if (value == null || neededType == null)
                     return null;

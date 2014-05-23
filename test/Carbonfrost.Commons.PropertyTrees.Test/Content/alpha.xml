@@ -1,5 +1,5 @@
 <alpha
-  xmlns:shared="http://ns.carbonfrost.com/2008/commons/sharedruntime"
+  xmlns:shared="http://ns.carbonfrost.com/commons/sharedruntime"
   a  = "yes"
   aa = ""
   b  = "0"

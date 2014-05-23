@@ -139,6 +139,7 @@ namespace Prototypes {
         public string D { get; set; }
 
         public Gamma E { get; set; }
+        public Properties F { get; set; }
 
         public Beta() {
             this.A = new Alpha();
@@ -398,6 +399,10 @@ namespace Prototypes {
         [AddAttribute(Name = "beta")]
         public Beta AddNewBeta(Uri c) {
             return B = new Beta { C = c };
+        }
+
+        [AddAttribute(Name = "epsilon")]
+        public static void AddNewEpsilon(Epsilon e) {
         }
     }
 

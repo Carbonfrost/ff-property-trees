@@ -57,6 +57,26 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 }
 
                 if (hasChildren && nav.MoveToFirst()) {
+                    // TODO Use correct ns logic on this source
+
+                    // Try reading from a source
+                    var sourceProperty = SelectProperty(context, nav.Namespace, "source");
+                    if (sourceProperty == null && nav.MoveToSibling("source")) {
+                        var ss = StreamingSource.Create(context.ComponentType);
+
+                        // TODO Could need to hydrate instead
+                        var comp = ss.Load(StreamContext.FromSource(new Uri(nav.Value.ToString())), context.ComponentType);
+
+                        var copyFrom = comp; // Load(inputSource, instance.GetType());
+                        // var props = Properties.FromValue(copyFrom);
+                        // Activation.Initialize(context.Component, props);
+                        Template.Create(copyFrom).Initialize(context.Component);
+
+                        // context.Component = comp;
+                        context.Mark(nav);
+                        nav.MoveToSibling(0);
+                    }
+
                     do {
                         if (!context.Mark(nav))
                             continue;
@@ -221,7 +241,14 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 if (hasChildren && lateBound) {
 
                     if (nav.MoveToSibling("type") && context.Mark(nav)) {
-                        context.ComponentType = TypeHelper.ConvertToType(nav.Value, ServiceProvider.Compose(ServiceProvider.FromValue(nav), context));
+                        var sp = ServiceProvider.Compose(ServiceProvider.FromValue(nav), context);
+                        var binder = GetPropertyTreeBinder(typeof(Type), sp);
+
+                        var childContext = new PropertyTreeBindingContext(context);
+                        childContext.ComponentType = typeof(Type);
+                        Type outputValue = (Type) binder.Bind(childContext, nav);
+
+                        context.ComponentType = outputValue;
                         context.FactoryOperator = context.TreeDefinition.Constructor;
 
                     } else if (nav.MoveToSibling("provider") && context.Mark(nav)) {
@@ -232,6 +259,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
                 } else if (hasChildren && type.IsProviderType() && nav.MoveToSibling("provider") && context.Mark(nav)) {
                     context.SetProvider(type, nav.Value);
+
+                } else if (type.GetConcreteClass() != null) {
+                    context.ComponentType = type.GetConcreteClass();
+                    context.FactoryOperator = context.TreeDefinition.Constructor;
 
                 } else if (type.IsComposable()) {
                     var member = AppDomain.CurrentDomain.GetProviderMember(context.ComponentType, qname);

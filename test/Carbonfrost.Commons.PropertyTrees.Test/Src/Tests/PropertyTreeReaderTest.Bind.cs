@@ -68,6 +68,17 @@ namespace Tests {
         }
 
         [Test]
+        public void bind_streaming_source() {
+            PropertyTreeReader pt = LoadContent("beta-3.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            Beta b = pt.Bind(new Beta());
+
+            Assert.That(b.F, Is.Not.Null);
+            Assert.That(b.F.GetProperty("time"), Is.EqualTo("after"));
+        }
+
+        [Test]
         public void bind_latebound_provider() {
             Assume.That(StreamingSource.FromName("xmlFormatter"), Is.Not.Null);
 
@@ -78,6 +89,16 @@ namespace Tests {
 
             Assert.That(AppDomain.CurrentDomain.GetProviderName(typeof(StreamingSource), b.A).LocalName,
                         Is.EqualTo("xmlFormatter"));
+        }
+
+        [Test]
+        public void bind_concrete_class_indirections() {
+            PropertyTreeReader pt = LoadContent("mu.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var b = (MuAlpha) pt.Bind<Mu>();
+            Assert.That(b.B,
+                        Is.EqualTo(420));
         }
 
         [Test]

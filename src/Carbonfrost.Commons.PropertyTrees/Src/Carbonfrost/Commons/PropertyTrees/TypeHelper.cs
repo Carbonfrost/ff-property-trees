@@ -47,7 +47,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         public static TypeConverter GetConverter(PropertyDefinition property, Type neededType) {
             TypeConverter conv = null;
-            if (property != null)
+            if (property != null && !(property.Converter is ReferenceConverter))
                 conv = property.Converter;
 
             if (conv == null)
