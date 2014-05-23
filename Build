@@ -47,6 +47,7 @@
       <assembly 
         privateKey="F5NonCommercial.snk"
         target="bin/net40/debug/x86/Carbonfrost.Commons.PropertyTrees.dll">
+        <runtime version="4.5.1" />
         <sources>
           <include name="src/Carbonfrost.Commons.PropertyTrees/**/*.cs" />
         </sources>
