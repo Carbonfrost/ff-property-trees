@@ -18,7 +18,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using Carbonfrost.Commons.Shared;
 using Carbonfrost.Commons.Shared.Runtime;
@@ -31,6 +33,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
         public static readonly IXmlLineInfo NullLineInfo = new NullLineInfoImpl();
         public static readonly INameScope NullNameScope = new NullNameScopeImpl();
         public static readonly IXmlNamespaceResolver NullResolver = new NullXmlNamespaceResolverImpl();
+        public static readonly IUriContext NullUriContext = new NullUriContextImpl();
 
         public static readonly IEqualityComparer<QualifiedName> OrdinalIgnoreCaseQualifiedName = new OrdinalIgnoreCaseQualifiedNameImpl();
 
@@ -39,6 +42,19 @@ namespace Carbonfrost.Commons.PropertyTrees {
         };
 
         private const int MAX_LENGTH = 40;
+
+        public static IEnumerable<Type> EnumerateInheritedTypes(Type sourceClrType) {
+            return sourceClrType.GetInterfaces()
+                .Concat(EnumerateInheritedBaseTypes(sourceClrType));
+        }
+
+        private static IEnumerable<Type> EnumerateInheritedBaseTypes(Type sourceClrType) {
+            var type = sourceClrType.BaseType;
+            while (type != null) {
+                yield return type;
+                type = type.BaseType;
+            }
+        }
 
         public static PropertyTreeFlavor InferFlavor(string file) {
             string ext = Path.GetExtension(file);
@@ -87,6 +103,13 @@ namespace Carbonfrost.Commons.PropertyTrees {
             object INameScope.FindName(string name) { return null; }
             void INameScope.RegisterName(string name, object scopedElement) {}
             void INameScope.UnregisterName(string name) {}
+        }
+
+        sealed class NullUriContextImpl : IUriContext {
+            public Uri BaseUri {
+                get { return null; }
+                set {}
+            }
         }
 
         sealed class NullLineInfoImpl : IXmlLineInfo {
@@ -142,9 +165,9 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         public static string DisplayName(string name, string ns) {
             string displayName = name;
-                if (!string.IsNullOrEmpty(ns)) {
-                    displayName = string.Format("{1} ({0})", ns, name);
-                }
+            if (!string.IsNullOrEmpty(ns)) {
+                displayName = string.Format("{1} ({0})", ns, name);
+            }
             return displayName;
         }
     }

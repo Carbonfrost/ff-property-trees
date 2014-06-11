@@ -101,7 +101,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
             public override object Apply(object component,
                                          object parent,
-                                         IDictionary<string, object> parameters) {
+                                         IReadOnlyDictionary<string, object> parameters) {
 
                 var parms = MapParameters(UnderlyingMethod, parent, parameters);
                 return DoAddChild(parent, ((ConstructorInfo) UnderlyingMethod).Invoke(parms));
@@ -122,7 +122,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
             public override object Apply(object component,
                                          object parent,
-                                         IDictionary<string, object> parameters) {
+                                         IReadOnlyDictionary<string, object> parameters) {
 
                 var parms = MapParameters(UnderlyingMethod, parent, parameters);
                 return DoAddChild(parent, UnderlyingMethod.Invoke(null, parms));

@@ -143,16 +143,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
         }
 
         private IEnumerable<Type> EnumerateInheritedTypes() {
-            return this.SourceClrType.GetInterfaces()
-                .Concat(EnumerateInheritedBaseTypes());
-        }
-
-        private IEnumerable<Type> EnumerateInheritedBaseTypes() {
-            var type = this.SourceClrType.BaseType;
-            while (type != null) {
-                yield return type;
-                type = type.BaseType;
-            }
+            return Utility.EnumerateInheritedTypes(this.SourceClrType);
         }
 
         private void FindAllOperators(Type type) {
@@ -160,6 +151,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
             foreach (MethodInfo method in type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)) {
                 bool match = false;
+                // TODO Check signaure of these methods because they could be illegal
                 foreach (RoleAttribute attribute in FindRoleAttributes(method)) {
                     this.operators.Add(attribute.BuildInstance(method));
                     match = true;
@@ -176,26 +168,61 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
                 switch (mi.Name) {
                     case "Add":
-                        if (mi.ReturnType == typeof(void) && !mi.IsDefined(typeof(AddAttribute), false) && parameters.Length == 1 && !parameters[0].IsOut && !parameters[0].ParameterType.IsByRef) {
-                            this.operators.Add(ReflectedPropertyTreeFactoryDefinition.FromListAddMethod(mi));
+                        if (IsValidAddon(mi, parameters)) {
+                            // TODO We're consuming duplicated names (here, below); they should be errors
+                            this.operators.TryAdd(ReflectedPropertyTreeFactoryDefinition.FromListAddMethod(mi));
                             var natural = ReflectedPropertyTreeFactoryDefinition.FromListAddMethod(mi, true);
                             if (natural != null && !this.operators.ContainsKey(natural.QualifiedName))
                                 this.operators.Add(natural);
                         }
                         break;
-                        
+
                     case "Clear":
                         this.operators.Add(new ReflectedClearDefinition(null, mi));
                         break;
-                        
+
                     case "RemoveAt":
-                        this.operators.Add(new ReflectedRemoveDefinition(null, mi));
+                        this.operators.TryAdd(new ReflectedRemoveDefinition(null, mi));
                         break;
-                        
+
                     case "Remove":
                         break;
                 }
             }
+        }
+
+        static bool IsValidAddon(MethodInfo mi, ParameterInfo[] parameters)
+        {
+            if (parameters.Length == 1) {
+                var param = parameters[0];
+
+                return mi.ReturnType == typeof(void)
+                    && !mi.IsDefined(typeof(AddAttribute), false)
+                    && !param.IsOut
+                    && !param.ParameterType.IsByRef;
+            }
+
+            return false;
+        }
+
+        static bool IsValidIndexer(MemberInfo member)
+        {
+            if (member.MemberType != MemberTypes.Property)
+                return false;
+
+            PropertyInfo pi = (PropertyInfo) member;
+            MethodInfo mi = pi.GetGetMethod();
+            if (mi == null)
+                return false;
+
+            ParameterInfo[] parameters = mi.GetParameters();
+            if (parameters.Length == 1) {
+                var param = parameters[0];
+
+                return (param.ParameterType == typeof(string) || param.ParameterType == typeof(QualifiedName));
+            }
+
+            return false;
         }
 
         IEnumerable<RoleAttribute> FindRoleAttributes(MethodInfo method) {
@@ -222,7 +249,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                 this.properties = new PropertyDefinitionCollection(
                     TypeDescriptor.GetProperties(this.SourceClrType).Cast<PropertyDescriptor>().Select(t => new ReflectedPropertyDefinition(t)));
 
-                var defaultMember = (PropertyInfo) this.type.GetDefaultMembers().FirstOrDefault();
+                var defaultMember = (PropertyInfo) this.type.GetDefaultMembers().FirstOrDefault(IsValidIndexer);
                 if (defaultMember != null) {
                     this.defaultProperty = new ReflectedIndexerPropertyDefinition(defaultMember);
                     this.Properties.AddInternal(this.defaultProperty);

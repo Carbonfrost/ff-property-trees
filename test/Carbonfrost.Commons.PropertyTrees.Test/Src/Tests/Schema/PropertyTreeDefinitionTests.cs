@@ -22,6 +22,7 @@ using System.Linq;
 using Carbonfrost.Commons.ComponentModel;
 using Carbonfrost.Commons.PropertyTrees;
 using Carbonfrost.Commons.PropertyTrees.Schema;
+using Carbonfrost.Commons.Shared;
 using NUnit.Framework;
 using Prototypes;
 
@@ -70,6 +71,21 @@ namespace Tests.Schema {
 
             Assert.That(fac, Is.Not.Null);
             Assert.That(fac2, Is.Not.Null);
+        }
+
+        [Test]
+        public void properties_should_include_text_type_indexer() {
+            var def = PropertyTreeDefinition.FromType(typeof(Dictionary<QualifiedName, int>));
+            Assert.That(def.Properties.FirstOrDefault(t => t.IsIndexer), Is.Not.Null);
+
+            def = PropertyTreeDefinition.FromType(typeof(Dictionary<string, int>));
+            Assert.That(def.Properties.FirstOrDefault(t => t.IsIndexer), Is.Not.Null);
+        }
+
+        [Test]
+        public void properties_should_not_include_non_text_types() {
+            var def = PropertyTreeDefinition.FromType(typeof(List<string>));
+            Assert.That(def.Properties.FirstOrDefault(t => t.IsIndexer), Is.Null);
         }
 
         [Test]

@@ -23,6 +23,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Carbonfrost.Commons.ComponentModel;
+using Carbonfrost.Commons.ComponentModel.Annotations;
 using Carbonfrost.Commons.ComponentModel.Converters;
 using Carbonfrost.Commons.PropertyTrees;
 using Carbonfrost.Commons.Shared.Runtime;
@@ -129,6 +130,61 @@ namespace Prototypes {
         }
     }
 
+    // This list class contains Add(object), Add(Beta), and AddNew()
+    public class BetaList : List<object>, IList<Beta> {
+
+        [Add(Name = "beta")] // $NON-NLS-1
+        public Beta AddNew(string name) {
+            var target = new Beta { D = name };
+            this.Add(target);
+
+            return target;
+        }
+
+        bool ICollection<Beta>.IsReadOnly {
+            get {
+                return false;
+            }
+        }
+
+        public int IndexOf(Beta item) {
+            throw new NotImplementedException();
+        }
+
+        public void Insert(int index, Beta item) {
+            throw new NotImplementedException();
+        }
+
+        public new Beta this[int index] {
+            get {
+                return (Beta) base[index];
+            }
+            set {
+                base[index] = value;
+            }
+        }
+
+        public void Add(Beta item) {
+            base.Add(item);
+        }
+
+        public bool Contains(Beta item) {
+            throw new NotImplementedException();
+        }
+
+        public void CopyTo(Beta[] array, int arrayIndex) {
+            base.CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(Beta item) {
+            return base.Remove(item);
+        }
+
+        public new IEnumerator<Beta> GetEnumerator() {
+            throw new NotImplementedException();
+        }
+    }
+
     public class Beta {
 
         // TODO Should ALpha be implicitly created like in XRMS?
@@ -136,10 +192,21 @@ namespace Prototypes {
         public Alpha A { get; set; }
         public Gamma B { get; set; }
         public Uri C { get; set; }
-        public string D { get; set; }
+        string d;
+        public string D {
+            get {
+                return d;
+            }
+            set {
+                d = value;
+            }
+        }
 
         public Gamma E { get; set; }
         public Properties F { get; set; }
+
+        // Should be treated as a property and not a streaming source
+        public string Source { get; set; }
 
         public Beta() {
             this.A = new Alpha();
@@ -166,12 +233,15 @@ namespace Prototypes {
         public new DateTime B { get; set; }
     }
 
+
     public class Delta {
 
         public IList<Alpha> A { get; private set; }
+        public IList<Beta> B { get; private set; }
 
         public Delta() {
             this.A = new List<Alpha>();
+            this.B = new List<Beta>();
         }
 
     }
@@ -224,7 +294,7 @@ namespace Prototypes {
         public long D { get; private set; }
         public Epsilon E { get; private set; }
 
-        public Epsilon(int a, TimeSpan b, double c, long d, Epsilon e) {
+        protected Epsilon(int a, TimeSpan b, double c, long d, Epsilon e) {
             this.A = a;
             this.B = b;
             this.C = c;
@@ -413,15 +483,23 @@ namespace Prototypes {
 
         public Alpha A_ { get { return a; } }
 
+        public bool B { get; set; }
+        public int C_ { get; set; }
+
         public object this[string key] {
             get {
                 switch (key) {
                     case "a":
                         return a;
                     default:
-                        return null;
+                        throw new KeyNotFoundException(key);
                 }
             }
+        }
+
+        [AddAttribute(Name = "C")]
+        public void Count() {
+            this.C_++;
         }
     }
 

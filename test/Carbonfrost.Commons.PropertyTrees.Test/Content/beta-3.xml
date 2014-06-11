@@ -1,3 +1,5 @@
-﻿<beta>
-  <f source="data:text/properties,time=after\nbe=waiting\nif=you\nfall=i" />
+﻿<beta xmlns:p="http://ns.carbonfrost.com/commons/propertytrees"
+      source="not a streaming source">
+  <f p:source="data:text/properties,time=after&#10;be=waiting&#10;if=you&#10;fall=i"
+     source="not a streaming source" />
 </beta>

@@ -52,6 +52,12 @@ namespace Tests.Schema {
             Assert.That(name, Is.EqualTo("String"));
         }
 
+        [Test]
+        public void natural_name_constructed_derived() {
+            string name = AddAttribute.GetNaturalName(typeof(PropertyNodeCollection));
+            Assert.That(name, Is.EqualTo("PropertyNode"));
+        }
+
         // TODO Support Dictionary<,> natural name - entry
     }
 }

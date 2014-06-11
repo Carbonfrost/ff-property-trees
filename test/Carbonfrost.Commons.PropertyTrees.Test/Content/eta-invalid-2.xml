@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<!-- Constructor arguments are in the wrong namespace-->
+<eta
+    xmlns:other = "http://ns.example.com"
+    a        = "256"
+    b        = "2.5:05:05.200"
+    c        = "2256.231250002"
+    other:d  = "293680235"
+>
+</eta>

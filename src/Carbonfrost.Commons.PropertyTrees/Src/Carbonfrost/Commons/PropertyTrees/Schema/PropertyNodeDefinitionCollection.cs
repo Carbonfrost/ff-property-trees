@@ -43,6 +43,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             return items.ContainsValue(value);
         }
 
+        internal void TryAdd(T item) {
+            if (!items.ContainsKey(item.QualifiedName))
+                AddInternal(item);
+        }
+
         internal virtual void AddInternal(T item) {
             lock (this.items) {
                 this.items.Add(item.QualifiedName, item);

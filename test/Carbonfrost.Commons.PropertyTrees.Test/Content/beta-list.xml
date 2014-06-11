@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" ?>
+<items>
+
+    <!-- Add-child operator beta was defined with AddNew(string):Beta -->
+    <beta
+        name = "btest"
+        c    = "http://carbonfrost.com"
+        d    = "Generic text">
+
+        <a
+            a  = "true"
+            e  = "3/30/2011 1:50 AM"></a>
+    </beta>
+
+    <!-- Add-child operator should be Add(Beta) -->
+    <add d = "Built-in add method" />
+
+</items>

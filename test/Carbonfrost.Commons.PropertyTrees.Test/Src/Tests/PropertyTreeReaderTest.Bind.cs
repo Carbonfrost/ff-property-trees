@@ -29,11 +29,12 @@ using Carbonfrost.Commons.Shared.Runtime.Conditions;
 using NUnit.Framework;
 using Prototypes;
 using Tests;
+using NUnitIgnore = NUnit.Framework.IgnoreAttribute;
 
 namespace Tests {
 
     [TestFixture]
-    public partial class PropertyTreeReaderTest : TestBase {
+    public class PropertyTreeReaderTest : TestBase {
 
         [Test]
         public void bind_complex_types() {
@@ -68,14 +69,27 @@ namespace Tests {
         }
 
         [Test]
+        public void bind_missing_properties_throws_exception() {
+            PropertyTreeReader pt = LoadContent("beta-4.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            Assert.That(() => pt.Bind<Beta>(), Throws.InstanceOf<PropertyTreeException>()
+                        .And.Message.StringMatching("line 2, pos 5"));
+        }
+
+        [Test]
         public void bind_streaming_source() {
             PropertyTreeReader pt = LoadContent("beta-3.xml");
             Assume.That(pt.Read(), Is.True);
 
             Beta b = pt.Bind(new Beta());
 
+            Assert.That(b.Source, Is.EqualTo("not a streaming source"));
+
             Assert.That(b.F, Is.Not.Null);
             Assert.That(b.F.GetProperty("time"), Is.EqualTo("after"));
+            Assert.That(b.F.GetProperty("fall"), Is.EqualTo("i"));
+            Assert.That(b.F.GetProperty("source"), Is.EqualTo("not a streaming source"));
         }
 
         [Test]
@@ -89,6 +103,17 @@ namespace Tests {
 
             Assert.That(AppDomain.CurrentDomain.GetProviderName(typeof(StreamingSource), b.A).LocalName,
                         Is.EqualTo("xmlFormatter"));
+        }
+
+        [Test]
+        public void bind_latebound_provider_criteria() {
+            PropertyTreeReader pt = LoadContent("iota-chi-2.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            IotaChi b = pt.Bind(new IotaChi());
+
+            Assert.That(AppDomain.CurrentDomain.GetProviderName(typeof(StreamingSource), b.A).LocalName,
+                        Is.EqualTo("properties"));
         }
 
         [Test]
@@ -108,7 +133,7 @@ namespace Tests {
 
             var b = pt.Bind<PiChi>().Preconditions;
             Assert.That(b.ToString(),
-                        Is.EqualTo("and(environment(\"PROCESSOR_LEVEL\", \"l\"), platform)"));
+                        Is.EqualTo("and(environment(\"PROCESSOR_LEVEL\", \"l\"), environment(\"QR\", \"m\"), platform())"));
         }
 
         [Test]
@@ -270,6 +295,9 @@ namespace Tests {
             Assert.That(d.A[2].Q, Is.EqualTo(new Uri("http://carbonfrost.com")));
             Assert.That(d.A[2].R, Is.EqualTo(TimeSpan.Parse("4.12:0:30.5")));
             Assert.That(d.A[2].S, Is.EqualTo(new Guid("{ED826F6C-47B5-4C40-B5B1-E847CB193E03}")));
+
+            Assert.That(d.B[0].A.F, Is.EqualTo(10.5000m));
+            Assert.That(d.B[0].A.G, Is.EqualTo(10.5));
         }
 
         [Test]
@@ -305,6 +333,7 @@ namespace Tests {
 
             Assert.That(o.B.C, Is.EqualTo(new Uri("http://carbonfrost.com")));
             Assert.That(o.B.D, Is.EqualTo("Generic text"));
+            Assert.That(o.B.A.A, Is.EqualTo(true));
 
             Assert.That(o.G.A, Is.EqualTo(CultureInfo.GetCultureInfo("en-US")));
         }
@@ -366,6 +395,8 @@ namespace Tests {
             Assert.That(p.A.Count, Is.EqualTo(0));
         }
 
+        // TODO Test add range where best item type is needed
+
         [Test]
         public void bind_add_range_property() {
             PropertyTreeReader pt = LoadContent("psi-add-range.xml");
@@ -400,6 +431,28 @@ namespace Tests {
             OmicronAlpha p = pt.Bind<OmicronAlpha>();
             Assert.That(p.A_.B, Is.EqualTo(0));
             Assert.That(p.A_.D, Is.EqualTo('g'));
+
+            // These should not bind as dictionary accesses
+            Assert.That(p.B, Is.True);
+            Assert.That(p.C_, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void bind_should_apply_explicit_factory_names() {
+            PropertyTreeReader pt = LoadContent("beta-list.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var p = pt.Bind<BetaList>();
+
+            Assert.That(p[0].D, Is.EqualTo("Generic text"));
+            Assert.That(p[0].C, Is.EqualTo(new Uri("http://carbonfrost.com")));
+            Assert.That(p[0].A.A, Is.EqualTo(true));
+            Assert.That(p[0].A.E, Is.EqualTo(new DateTime(2011, 3, 30, 1, 50, 00)));
+
+            // TODO Behavior of <add> is technically undefined because it could be Add(Beta) or Add(Object)
+            Assert.That(p[1].D, Is.EqualTo("Built-in add method"));
+
         }
     }
+
 }

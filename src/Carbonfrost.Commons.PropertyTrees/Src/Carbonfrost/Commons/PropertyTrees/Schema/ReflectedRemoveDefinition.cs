@@ -47,7 +47,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get { return info.Name; }
             set { throw Failure.ReadOnlyProperty(); } }
 
-        public override object Apply(object component, object parent, IDictionary<string, object> parameters) {
+        public override object Apply(object component, object parent, IReadOnlyDictionary<string, object> parameters) {
             var parms = MapParameters(UnderlyingMethod, parent, parameters);
             return info.Method.Invoke(component, parms);
         }

@@ -1,0 +1,6 @@
+<!-- Type reference does not resolve -->
+<alpha
+  xmlns:shared="http://ns.carbonfrost.com/commons/sharedruntime"
+  u  = "shared:InvalidTypeReference"
+/>
+

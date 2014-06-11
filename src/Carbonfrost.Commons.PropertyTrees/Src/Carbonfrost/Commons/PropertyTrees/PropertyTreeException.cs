@@ -48,11 +48,13 @@ namespace Carbonfrost.Commons.PropertyTrees {
         }
 
         public PropertyTreeException(string message, Exception innerException, FileLocation fileLocation)
-            : base(BuildMessage(message, fileLocation), innerException) {
+            : base(BuildMessage(message, fileLocation, innerException as PropertyTreeException), innerException) {
+            this.FileLocation = fileLocation;
         }
 
-        static string BuildMessage(string message, FileLocation location) {
-            if (location.IsEmpty)
+        static string BuildMessage(string message, FileLocation location, PropertyTreeException inner) {
+            // Don't present multiple line infos
+            if (location.IsEmpty || (inner != null && inner.LineNumber > 0))
                 return message;
             else
                 return message + Environment.NewLine + Environment.NewLine + location.ToString("h");

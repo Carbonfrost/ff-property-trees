@@ -1,0 +1,52 @@
+//
+// - ApplyConstructorStep.cs -
+//
+// Copyright 2014 Carbonfrost Systems, Inc. (http://carbonfrost.com)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Carbonfrost.Commons.Shared;
+using Carbonfrost.Commons.PropertyTrees.Schema;
+
+namespace Carbonfrost.Commons.PropertyTrees.Serialization {
+
+    partial class PropertyTreeBinderImpl {
+
+        class ApplyConstructorStep : PropertyTreeBinderStep {
+
+            public override PropertyTreeMetaObject StartStep(PropertyTreeMetaObject target, PropertyTreeNavigator self, NodeList children) {
+                QualifiedName name = self.QualifiedName;
+                var ctor = PropertyTreeDefinition.FromType(target.ComponentType).Constructor;
+
+                if (target.Component == null && ctor != null) {
+                    OperatorDefinition op = ctor;
+                    var args = ExtractParameterDictionary(op, target, Parent.GetBasicServices(self), children);
+
+                    target = target.BindConstructor(ctor, args);
+                }
+
+                return target;
+            }
+
+            public override PropertyTreeMetaObject EndStep(PropertyTreeMetaObject target) {
+                return target;
+            }
+
+        }
+    }
+
+}

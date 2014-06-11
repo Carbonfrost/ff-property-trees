@@ -27,8 +27,21 @@ namespace Carbonfrost.Commons.PropertyTrees {
     internal static class Empty<TKey, TValue> {
 
         public static readonly IDictionary<TKey, TValue> Dictionary = new NullDictionary();
+        public static readonly IReadOnlyDictionary<TKey, TValue> ReadOnlyDictionary = (IReadOnlyDictionary<TKey, TValue>) Dictionary;
 
-        private sealed class NullDictionary : IDictionary<TKey, TValue> {
+        private sealed class NullDictionary : IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue> {
+
+            IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys {
+                get {
+                    return Empty<TKey>.Array;
+                }
+            }
+
+            IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values {
+                get {
+                    return Empty<TValue>.Array;
+                }
+            }
 
             void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item) {
                 throw Failure.ReadOnlyCollection();
@@ -53,7 +66,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 throw Failure.ReadOnlyCollection();
             }
 
-            bool IDictionary<TKey, TValue>.ContainsKey(TKey key) {
+            public bool ContainsKey(TKey key) {
                 return false;
             }
 
@@ -61,7 +74,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 return false;
             }
 
-            bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value) {
+            public bool TryGetValue(TKey key, out TValue value) {
                 value = default(TValue);
                 return false;
             }
@@ -74,7 +87,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 return Empty<KeyValuePair<TKey, TValue>>.Enumerator;
             }
 
-            int ICollection<KeyValuePair<TKey, TValue>>.Count {
+            public int Count {
                 get {
                     return 0;
                 }
@@ -86,7 +99,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 }
             }
 
-            TValue IDictionary<TKey, TValue>.this[TKey key] {
+            public TValue this[TKey key] {
                 get {
                     throw new KeyNotFoundException();
                 }

@@ -25,6 +25,7 @@ using Carbonfrost.Commons.ComponentModel;
 using Carbonfrost.Commons.PropertyTrees.Schema;
 using Carbonfrost.Commons.Shared;
 using Carbonfrost.Commons.Shared.Runtime;
+using Carbonfrost.Commons.PropertyTrees.Serialization;
 
 namespace Carbonfrost.Commons.PropertyTrees {
 
@@ -197,6 +198,12 @@ namespace Carbonfrost.Commons.PropertyTrees {
         public abstract object Value { get; set; }
         public abstract PropertyNodeType NodeType { get; }
 
+        public virtual FileLocation FileLocation {
+            get {
+                return new FileLocation(LineNumber, LinePosition, null);
+            }
+        }
+
         // IXmlLineInfo implementation
         public virtual int LineNumber { get { return -1; } }
         public virtual int LinePosition { get { return -1; } }
@@ -216,16 +223,26 @@ namespace Carbonfrost.Commons.PropertyTrees {
         }
 
         // `IPropertyTreeReader' implemenation
-        public object Bind(Type componentType) {
-            throw new NotImplementedException();
+        public virtual object Bind(Type componentType) {
+            if (componentType == null)
+                throw new ArgumentNullException("componentType"); // $NON-NLS-1
+
+            var obj = PropertyTreeMetaObject.Create(componentType);
+            return TopLevelBind(obj, null).Component;
         }
 
-        public T Bind<T>() {
-            throw new NotImplementedException();
+        public virtual T Bind<T>() {
+            return (T) Bind(typeof(T));
         }
 
-        public T Bind<T>(T model) {
-            throw new NotImplementedException();
+        public virtual T Bind<T>(T model) {
+            PropertyTreeMetaObject obj;
+            if (ReferenceEquals(model, null))
+                obj = PropertyTreeMetaObject.Create(typeof(T));
+            else
+                obj = PropertyTreeMetaObject.Create(model);
+
+            return (T) TopLevelBind(obj, null).Component;
         }
 
         public void CopyContentsTo(PropertyTree tree) {
@@ -244,6 +261,9 @@ namespace Carbonfrost.Commons.PropertyTrees {
             throw new NotImplementedException();
         }
 
+        internal PropertyTreeMetaObject TopLevelBind(PropertyTreeMetaObject obj, IServiceProvider serviceProvider) {
+            return PropertyTreeMetaObjectBinder.Create().Bind(obj, this, serviceProvider);
+        }
     }
 
 }

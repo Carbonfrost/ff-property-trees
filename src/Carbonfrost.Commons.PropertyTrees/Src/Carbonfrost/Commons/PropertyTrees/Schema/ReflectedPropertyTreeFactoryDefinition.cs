@@ -94,6 +94,10 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get { return info.Name; }
             set { throw Failure.ReadOnlyProperty(); } }
 
+        public override string ToString() {
+            return OutputType.ToString();
+        }
+
         sealed class ConstructorFactory : ReflectedPropertyTreeFactoryDefinition {
 
             public ConstructorFactory(AddAttribute attr, MethodBase method) : base(attr, method, GetReturnType(method)) {
@@ -101,7 +105,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
             public override PropertyDefinition DefaultParameter { get { return null; } }
 
-            public override object Apply(object component, object parent, IDictionary<string, object> parameters) {
+            public override object Apply(object component, object parent, IReadOnlyDictionary<string, object> parameters) {
                 var parms = MapParameters(UnderlyingMethod, parent, parameters);
                 return ((ConstructorInfo) UnderlyingMethod).Invoke(parms);
             }
@@ -119,7 +123,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                 }
             }
 
-            public override object Apply(object component, object parent, IDictionary<string, object> parameters) {
+            public override object Apply(object component, object parent, IReadOnlyDictionary<string, object> parameters) {
                 var parms = MapParameters(UnderlyingMethod, parent, parameters);
                 return UnderlyingMethod.Invoke(parent, parms);
             }
@@ -137,7 +141,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                 }
             }
 
-            public override object Apply(object component, object parent, IDictionary<string, object> parameters) {
+            public override object Apply(object component, object parent, IReadOnlyDictionary<string, object> parameters) {
                 object[] items = MapParameters(UnderlyingMethod, parent, parameters);
                 return UnderlyingMethod.Invoke(null, items);
             }
@@ -155,7 +159,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                 }
             }
 
-            public override object Apply(object component, object parent, IDictionary<string, object> parameters) {
+            public override object Apply(object component, object parent, IReadOnlyDictionary<string, object> parameters) {
                 object[] mappedParameters = MapParameters(UnderlyingMethod, parent, parameters);
                 UnderlyingMethod.Invoke(component, mappedParameters);
                 return mappedParameters[0];

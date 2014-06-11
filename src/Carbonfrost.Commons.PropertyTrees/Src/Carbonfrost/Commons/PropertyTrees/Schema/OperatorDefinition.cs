@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Carbonfrost.Commons.PropertyTrees.Serialization;
 
 namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
@@ -29,9 +30,14 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
         public abstract PropertyDefinitionCollection Parameters { get; }
         public abstract PropertyDefinition DefaultParameter { get; }
 
-        public abstract object Apply(object component, object parent, IDictionary<string, object> parameters);
+        internal object Apply(object component, object parent, IReadOnlyDictionary<string, PropertyTreeMetaObject> parameters) {
+            // TODO Consider checking for the type instead of instantiating adapter (performance)
+            return Apply(component, parent, new MetaArgumentAdapter(parameters));
+        }
 
-        internal static object[] MapParameters(MethodBase ctor, object parent, IDictionary<string, object> parameters) {
+        public abstract object Apply(object component, object parent, IReadOnlyDictionary<string, object> parameters);
+
+        internal static object[] MapParameters(MethodBase ctor, object parent, IReadOnlyDictionary<string, object> parameters) {
             ParameterInfo[] parms = ctor.GetParameters();
             int index = 0;
             object[] args = new object[parms.Length];

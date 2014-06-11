@@ -21,12 +21,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security;
 using Carbonfrost.Commons.PropertyTrees.Schema;
 using Carbonfrost.Commons.Shared;
 
 namespace Carbonfrost.Commons.PropertyTrees {
 
     internal static class Mixins {
+
+        public static void All<T>(this IEnumerable<T> items) {
+            var disp = items.GetEnumerator();
+            while (disp.MoveNext()) {}
+        }
+
+        public static bool IsHiddenUX(this Type type) {
+            // Prevent confusion in the error message by concealing internal type
+            // names from error messages
+
+            if (type.Namespace == "Carbonfrost.Commons.PropertyTrees.Serialization")
+                return true;
+            else
+                return false;
+        }
+
+        public static bool IsCriticalException(this Exception ex) {
+            // NRE, access violation, etc. that occur in this assembly are critical
+            if (ex.TargetSite.DeclaringType.Assembly == typeof(Mixins).Assembly)
+                return Require.IsCriticalException(ex);
+
+            // State-corrupting and serious exceptions in user code (but not
+            // common debuggable errors like NRE)
+            return ex is OutOfMemoryException
+                || ex is StackOverflowException
+                || ex is SEHException
+                || ex is SecurityException;
+        }
 
         public static TValue GetValueOrCache<TKey, TValue>(
             this IDictionary<TKey, TValue> source, TKey key,
@@ -43,6 +73,18 @@ namespace Carbonfrost.Commons.PropertyTrees {
             }
 
             return result;
+        }
+
+        public static TValue GetValueOrDefault<TKey, TValue>(
+            this IDictionary<TKey, TValue> source, TKey key,
+            TValue defaultValue = default(TValue))
+        {
+            TValue result = defaultValue;
+            if (source.TryGetValue(key, out result)) {
+                return result;
+            }
+
+            return defaultValue;
         }
 
         public static bool IsExtension(this ICustomAttributeProvider any) {

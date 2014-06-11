@@ -17,12 +17,14 @@
 //
 
 using System;
+using Carbonfrost.Commons.Shared;
 
 namespace Carbonfrost.Commons.PropertyTrees {
 
-    public static class Xmlns {
+    static class Xmlns {
 
-        public const string PropertyTrees2010 = "http://ns.carbonfrost.com/2010/commons/propertytrees";
-        public const string PropertyTreesSchema2010 = "http://ns.carbonfrost.com/2010/commons/propertytrees/schema";
+        public const string PropertyTrees2010 = "http://ns.carbonfrost.com/commons/propertytrees";
+        public static readonly NamespaceUri PropertyTrees2010Uri = NamespaceUri.Create(PropertyTrees2010);
+        public const string PropertyTreesSchema2010 = "http://ns.carbonfrost.com/commons/propertytrees/schema";
     }
 }

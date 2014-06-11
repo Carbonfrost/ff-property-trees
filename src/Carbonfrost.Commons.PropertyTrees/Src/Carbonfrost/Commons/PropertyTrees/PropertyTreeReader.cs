@@ -69,19 +69,15 @@ namespace Carbonfrost.Commons.PropertyTrees {
             if (componentType == null)
                 throw new ArgumentNullException("componentType"); // $NON-NLS-1
 
-            PropertyTreeBinder binder =
-                PropertyTreeBinder.GetPropertyTreeBinder(componentType, null);
-            return binder.Bind(componentType, this);
+            return this.CreateNavigator().Bind(componentType);
         }
 
         public virtual T Bind<T>() {
             return (T) Bind(typeof(T));
         }
 
-        public virtual T Bind<T>(T model) {
-            PropertyTreeBinder binder =
-                PropertyTreeBinder.GetPropertyTreeBinder(typeof(T), null);
-            return (T) binder.Bind(model, this);
+        public virtual T Bind<T>(T component) {
+            return (T) this.CreateNavigator().Bind(component);
         }
 
         public void CopySubtreeTo(PropertyTreeWriter writer) {

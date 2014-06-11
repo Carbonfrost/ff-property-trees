@@ -158,10 +158,6 @@ namespace Carbonfrost.Commons.PropertyTrees {
             int position = 0;
             if (data.Count > 0) {
                 NodeData current = this.data.Peek();
-                // TODO Xmlns could be explicitly reset (xmlns="") (uncommon)
-                if (string.IsNullOrEmpty(result._namespace))
-                    result._namespace = current._namespace;
-
                 // Replacing a sibling
                 if (current.IsProperty) {
                     this.data.Pop();
@@ -171,6 +167,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
                     this.data.Pop();
                     position = current._position;
                 }
+
+                // TODO Xmlns could be explicitly reset (xmlns="") (uncommon)
+                if (string.IsNullOrEmpty(result._namespace) && this.data.Count > 0)
+                    result._namespace = this.data.Peek()._namespace;
             }
 
             result._depth = data.Count;

@@ -26,12 +26,6 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
     sealed class DefaultPopulateCallback : IPopulateComponentCallback {
 
-        private readonly IXmlLineInfo lineInfo;
-
-        public DefaultPopulateCallback(IXmlLineInfo lineInfo) {
-            this.lineInfo = lineInfo;
-        }
-
         // IPopulateComponentCallback
         public void OnPropertyAnnotation(string property, InterfaceUsageInfo usageInfo) {
             _OnPropertyAnnotation(property, usageInfo);
@@ -45,43 +39,22 @@ namespace Carbonfrost.Commons.PropertyTrees {
             if (usageInfo == null)
                 throw new ArgumentNullException("usageInfo"); // $NON-NLS-1
 
-            int lineNumber = -1;
-            int linePosition = -1;
-
-            IXmlLineInfo x = this.lineInfo;
-            if (x != null) {
-                lineNumber = x.LineNumber;
-                linePosition = x.LinePosition;
-            }
-
             switch (usageInfo.Usage) {
                 case InterfaceUsage.Missing:
-                    throw PropertyTreesFailure.BinderMissingProperty(lineNumber, linePosition, usageInfo);
+                    throw PropertyTreesFailure.BinderMissingProperty(usageInfo);
 
                 case InterfaceUsage.Obsolete:
                 case InterfaceUsage.Preliminary:
                     if (usageInfo.IsError)
-                        throw PropertyTreesFailure.BinderObsoleteProperty(lineNumber, linePosition, usageInfo);
+                        throw PropertyTreesFailure.BinderObsoleteProperty(usageInfo);
 
                     break;
             }
         }
 
         public void OnConversionException(string property, object value, Exception exception) {
-            int lineNumber = -1;
-            int linePosition = -1;
-            IXmlLineInfo x = this.lineInfo;
-            if (x != null) {
-                lineNumber = x.LineNumber;
-                linePosition = x.LinePosition;
-            }
-
-            string conversionFrom = Convert.ToString(value);
-            throw PropertyTreesFailure.BinderConversionError(conversionFrom,
-                                                             property,
-                                                             lineNumber,
-                                                             linePosition,
-                                                             exception);
+            // Wrap the exception so that original exception site is maintained
+            throw PropertyTreesFailure.ConversionGenericMessage(exception);
         }
 
     }

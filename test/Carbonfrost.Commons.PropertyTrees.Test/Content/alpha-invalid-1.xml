@@ -1,0 +1,5 @@
+<!-- Boolean text does not convert -->
+<alpha
+  a  = "Boolean"
+/>
+

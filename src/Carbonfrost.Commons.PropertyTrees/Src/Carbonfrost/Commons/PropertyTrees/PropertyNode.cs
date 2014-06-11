@@ -239,15 +239,15 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         // `IPropertyTreeReader`
         public T Bind<T>() {
-            return this.ReadNode(true).Bind<T>();
+            return CreateNavigator().Bind<T>();
         }
 
         public T Bind<T>(T model) {
-            return this.ReadNode(true).Bind<T>(model);
+            return CreateNavigator().Bind<T>(model);
         }
 
         public object Bind(Type instanceType) {
-            return this.ReadNode(true).Bind(instanceType);
+            return CreateNavigator().Bind(instanceType);
         }
 
         // IHierarchyObject implementation

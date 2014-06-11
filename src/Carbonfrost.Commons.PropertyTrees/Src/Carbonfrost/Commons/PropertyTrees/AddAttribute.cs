@@ -28,7 +28,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public sealed class AddAttribute : RoleAttribute {
 
-        static readonly Regex PATTERN = new Regex(@"(Builder)?Collection(`\d+)?$");
+        static readonly Regex PATTERN = new Regex(@"(Builder)?(Collection|List)(`\d+)?$");
 
         internal static readonly AddAttribute Default = new AddAttribute();
         internal static readonly AddAttribute Natural = new AddAttribute();
@@ -91,8 +91,9 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 }
 
                 return null;
-            } else
+            } else {
                 return PATTERN.Replace(declaringType.Name, string.Empty);
+            }
         }
     }
 

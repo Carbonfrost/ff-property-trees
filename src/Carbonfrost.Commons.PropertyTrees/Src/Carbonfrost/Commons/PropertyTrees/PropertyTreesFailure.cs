@@ -17,8 +17,10 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Carbonfrost.Commons.ComponentModel;
+using Carbonfrost.Commons.Shared.Runtime;
 using Carbonfrost.Commons.PropertyTrees.Resources;
 using Carbonfrost.Commons.Shared;
 
@@ -46,27 +48,31 @@ namespace Carbonfrost.Commons.PropertyTrees {
             return Failure.Prepare(new PropertyTreeException(SR.ReaderWrongPosition(expect, actual)));
         }
 
-        public static PropertyTreeException BinderMissingProperty(int lineNumber, int linePosition, InterfaceUsageInfo usageInfo) {
-            return Failure.Prepare(new PropertyTreeException(usageInfo.Message, lineNumber, linePosition) {
+        public static PropertyTreeException UnmatchedMembersGenericError(Exception ex, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.UnmatchedMembersGenericError(), ex, loc));
+        }
+
+        public static PropertyTreeException BinderMissingProperty(InterfaceUsageInfo usageInfo) {
+            return Failure.Prepare(new PropertyTreeException(usageInfo.Message) {
                                        HelpLink = Convert.ToString(usageInfo.HelpUri),
                                    });
         }
 
-        public static PropertyTreeException BinderObsoleteProperty(int lineNumber, int linePosition, InterfaceUsageInfo usageInfo) {
-            return Failure.Prepare(new PropertyTreeException(usageInfo.Message, lineNumber, linePosition) {
+        public static PropertyTreeException BinderObsoleteProperty(InterfaceUsageInfo usageInfo) {
+            return Failure.Prepare(new PropertyTreeException(usageInfo.Message) {
                                        HelpLink = Convert.ToString(usageInfo.HelpUri),
                                    });
         }
 
-        public static PropertyTreeException BinderConversionError(string text, string propertyName, int lineNumber, int linePosition, Exception exception) {
-            return Failure.Prepare(new PropertyTreeException(SR.BinderConversionError(propertyName), exception, lineNumber, linePosition));
+        public static PropertyTreeException BinderConversionError(string text, string propertyName, Type type, Exception exception, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.BinderConversionError(propertyName, type), exception, loc));
         }
 
         public static PropertyTreeException LateBoundTypeMissing(int lineNumber, int linePosition) {
             return Failure.Prepare(new PropertyTreeException(SR.LateBoundTypeMissing(), lineNumber, linePosition));
         }
 
-        public static PropertyTreeException RequiredPropertiesMissing(string[] names, string hintSignature, int lineNumber, int linePosition) {
+        public static PropertyTreeException RequiredPropertiesMissing(IEnumerable<string> names, string hintSignature, int lineNumber, int linePosition) {
             return Failure.Prepare(new PropertyTreeException(
                 SR.RequiredPropertiesMissing(string.Join(", ", names), hintSignature),
                 lineNumber,
@@ -135,6 +141,51 @@ namespace Carbonfrost.Commons.PropertyTrees {
                                                                      int lineNumber,
                                                                      int linePosition) {
             return Failure.Prepare(new PropertyTreeException(SR.ProblemAccessingProperty(qualifiedName, component.GetType()), ex, lineNumber, linePosition));
+        }
+
+        public static PropertyTreeException BadSourceDirective(Exception ex, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.BadSourceDirective(), ex, loc));
+        }
+
+        public static PropertyTreeException BadTargetTypeDirective(Exception ex, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.BadTargetTypeDirective(), ex, loc));
+        }
+
+        public static ArgumentException TemplateTypeConstructorMustBeNiladic(string argumentName, Type componentType) {
+            return Failure.Prepare(new ArgumentException(SR.TemplateTypeConstructorMustBeNiladic(componentType), argumentName));
+        }
+
+        public static PropertyTreeException BadTargetProviderDirective(Exception ex, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.BadTargetProviderDirective(), ex, loc));
+        }
+
+        public static ArgumentException PropertyTreeMetaObjectComponentNull() {
+            return Failure.Prepare(new ArgumentException(SR.PropertyTreeMetaObjectComponentNull()));
+        }
+
+        public static PropertyTreeException DuplicatePropertyName(IEnumerable<QualifiedName> duplicates, FileLocation loc) {
+            string text = string.Join(", ", duplicates);
+            return Failure.Prepare(new PropertyTreeException(SR.DuplicatePropertyName(text), null, loc));
+        }
+
+        public static PropertyTreeException NoAddMethodSupported(Type type, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.NoAddMethodSupported(type), null, loc));
+        }
+
+        public static PropertyTreeException CouldNotBindStreamingSource(Type type, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.CouldNotBindStreamingSource(type), null, loc));
+        }
+
+        public static PropertyTreeException NoTargetProviderMatches(Type type, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.NoTargetProviderMatches(type), null, loc));
+        }
+
+        public static FormatException ConversionGenericMessage(Exception exception) {
+            return Failure.Prepare(new FormatException(SR.ConversionGenericMessage(), exception));
+        }
+
+        public static PropertyTreeException BadAddChild(Type parentType, Exception ex, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.BadAddChild(parentType), ex, loc));
         }
     }
 

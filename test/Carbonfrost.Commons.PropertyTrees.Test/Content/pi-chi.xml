@@ -2,6 +2,7 @@
 <piChi>
     <preconditions>
         <environment variable="PROCESSOR_LEVEL" pattern="l" />
+        <environment variable="QR" pattern="m" />
         <platform />
     </preconditions>
 

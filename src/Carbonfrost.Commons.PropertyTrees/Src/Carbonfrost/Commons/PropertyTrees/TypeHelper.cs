@@ -45,7 +45,13 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 return ((MethodInfo) method).ReturnType;
         }
 
-        public static TypeConverter GetConverter(PropertyDefinition property, Type neededType) {
+        private static Type FindICollectionType(Type type) {
+            // TODO Could be ambiguous if type implements ICollection<> multiple times
+            return type.GetInterfaces().FirstOrDefault(t => t.IsGenericType && !t.IsGenericTypeDefinition && t.IsInterface
+                                                       && t.GetGenericTypeDefinition() == typeof(ICollection<>));
+        }
+
+        public static TypeConverter GetConverter(PropertyDescriptor property, Type neededType) {
             TypeConverter conv = null;
             if (property != null && !(property.Converter is ReferenceConverter))
                 conv = property.Converter;
@@ -54,12 +60,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 conv = TypeDescriptor.GetConverter(neededType);
 
             // On .NET, ReferenceConverter is returned
-            if (conv == null || conv is ReferenceConverter) {
-                if (neededType.IsGenericType
-                    && !neededType.IsGenericTypeDefinition
-                    && (neededType.GetGenericTypeDefinition() == typeof(IList<>)
-                        || neededType.GetGenericTypeDefinition() == typeof(List<>)))
-                    return ListConverter.Instance(neededType.GetGenericArguments()[0]);
+            if (conv == null || conv is ReferenceConverter || conv is CollectionConverter) {
+                var colType = FindICollectionType(neededType);
+                if (colType != null)
+                    return ListConverter.Instance(colType.GetGenericArguments()[0]);
             }
 
             if (conv is EnumConverter)

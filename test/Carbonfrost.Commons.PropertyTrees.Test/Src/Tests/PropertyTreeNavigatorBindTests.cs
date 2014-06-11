@@ -31,8 +31,7 @@ namespace Tests {
             PropertyTree pt = LoadTree("alpha-empty.xml");
             Alpha a = new Alpha();
 
-            PropertyTreeBinder.GetPropertyTreeBinder(typeof(Alpha), null)
-                .Bind(a, pt.CreateNavigator());
+            pt.Bind(a);
             Assume.That(a.A, Is.False);
             Assume.That(a.C, Is.Null);
         }
@@ -42,8 +41,7 @@ namespace Tests {
             PropertyTree pt = LoadTree("alpha-list.xml");
             Alpha a = new Alpha();
 
-            PropertyTreeBinder.GetPropertyTreeBinder(typeof(Alpha), null)
-                .Bind(a, pt.Children[0].CreateNavigator());
+            pt.Children[0].Bind(a);
 
             Assume.That(a.A, Is.False);
             Assume.That(a.C, Is.Null);
@@ -55,8 +53,7 @@ namespace Tests {
             PropertyTree pt = LoadTree("alpha-list.xml");
             Alpha a = new Alpha();
 
-            PropertyTreeBinder.GetPropertyTreeBinder(typeof(Alpha), null)
-                .Bind(a, pt.Children[2].CreateNavigator());
+            pt.Children[2].Bind(a);
 
             Assume.That(a.A, Is.False);
             Assume.That(a.C, Is.Null);

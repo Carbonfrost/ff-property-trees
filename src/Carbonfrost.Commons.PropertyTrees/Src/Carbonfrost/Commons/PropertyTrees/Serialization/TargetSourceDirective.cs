@@ -1,7 +1,7 @@
 //
-// - PropertyTreeBinderFactoryAttribute.cs -
+// - TargetSourceDirective.cs -
 //
-// Copyright 2010 Carbonfrost Systems, Inc. (http://carbonfrost.com)
+// Copyright 2014 Carbonfrost Systems, Inc. (http://carbonfrost.com)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,17 +19,22 @@
 using System;
 using Carbonfrost.Commons.Shared.Runtime;
 
-namespace Carbonfrost.Commons.PropertyTrees {
+namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
-	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
-	public sealed class PropertyTreeBinderFactoryAttribute : AdapterFactoryAttribute {
+    class TargetSourceDirective {
 
-	    public Type PropertyTreeBinderFactoryType { get; set; }
+        private readonly Uri source;
 
-	    public PropertyTreeBinderFactoryAttribute(Type adapterFactoryType) 
-	        : base(AdapterRole.PropertyTreeBinder, adapterFactoryType) {
-	        this.PropertyTreeBinderFactoryType = adapterFactoryType;
-	    }
+        public StreamContext GetStreamingContext() {
+            return StreamContext.FromSource(source);
+        }
 
-	}
+        public TargetSourceDirective(Uri source) {
+            this.source = source;
+        }
+
+    }
+
 }
+
+
