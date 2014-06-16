@@ -25,7 +25,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public abstract Type OutputType { get; }
 
-        public sealed override OperatorType Operator {
+        public sealed override OperatorType OperatorType {
             get { return OperatorType.Add; } }
 
         // TODO Implicit add name is derived from collection types:

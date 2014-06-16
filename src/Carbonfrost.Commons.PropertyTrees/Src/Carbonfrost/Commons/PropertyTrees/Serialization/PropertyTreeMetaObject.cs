@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using Carbonfrost.Commons.ComponentModel;
 using Carbonfrost.Commons.Shared;
@@ -29,10 +30,16 @@ using Carbonfrost.Commons.PropertyTrees.Schema;
 
 namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
-    public abstract class PropertyTreeMetaObject {
+    public abstract class PropertyTreeMetaObject : IHierarchyObject {
 
         public static readonly PropertyTreeMetaObject Null
             = new NullMetaObject();
+
+        private IEnumerable<PropertyTreeMetaObject> Ancestors {
+            get {
+                return this.GetAncestors().Cast<PropertyTreeMetaObject>();
+            }
+        }
 
         public abstract Type ComponentType {
             get;
@@ -77,7 +84,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             return this;
         }
 
-        public virtual void BindSetMember(PropertyDefinition property, QualifiedName name, PropertyTreeMetaObject value, IServiceProvider serviceProvider) {
+        public virtual void BindSetMember(PropertyDefinition property, QualifiedName name, PropertyTreeMetaObject value, PropertyTreeMetaObject ancestor, IServiceProvider serviceProvider) {
         }
 
         internal PropertyTreeMetaObject BindTargetProvider(TargetProviderDirective binder, IServiceProvider serviceProvider) {
@@ -219,14 +226,59 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
         }
 
         internal PropertyDefinition SelectProperty(QualifiedName qn) {
-            var definition = GetDefinition();
-            var result = definition.GetProperty(qn);
+            var result = SelectPropertyCore(qn);
+
             if (result == null) {
                 this.ProbeRuntimeComponents();
-                result = definition.GetProperty(qn);
+                result = SelectPropertyCore(qn);
             }
 
-            return result ?? definition.DefaultProperty;
+            return result ?? GetDefinition().DefaultProperty;
+        }
+
+        private PropertyDefinition SelectPropertyCore(QualifiedName qn) {
+            var definition = GetDefinition();
+            var result = definition.GetProperty(qn);
+            if (result != null)
+                return result;
+
+            int dot = qn.LocalName.IndexOf('.');
+            if (dot > 0) {
+                // TODO Index whether the PTD has extenders so we can skip some ancestors (perf)
+                string prefix = qn.LocalName.Substring(0, dot);
+
+                foreach (var current in Ancestors) {
+                    var currentDef = current.GetDefinition();
+                    if (currentDef.Name == prefix) {
+                        // TODO Local name could be different
+                        var prop = currentDef.GetProperty(qn);
+                        if (prop != null) {
+                            return prop;
+                        }
+                    }
+                }
+
+            } else {
+
+                foreach (var current in Ancestors) {
+                    var curDefinition = current.GetDefinition();
+                    var prop = curDefinition.GetProperty(qn);
+                    if (IsValidExtender(prop))
+                        return prop;
+
+                    var qn2 = qn.ChangeLocalName(current.ComponentType.Name + "." + qn.LocalName);
+                    prop = curDefinition.GetProperty(qn2);
+                    if (IsValidExtender(prop))
+                        return prop;
+
+                }
+            }
+
+            return null;
+        }
+
+        private bool IsValidExtender(PropertyDefinition prop) {
+            return prop != null && prop.IsExtender && prop.CanExtend(this.ComponentType);
         }
 
         // TODO According to spec, dependencies should be enumerated first, which should mean we don't probe after they have been
@@ -258,6 +310,21 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 }
             }
             return factory;
+        }
+
+        IHierarchyObject IHierarchyObject.ParentObject {
+            get {
+                return this.Parent;
+            }
+            set {
+            }
+        }
+
+        public IEnumerable<IHierarchyObject> ChildrenObjects {
+            get {
+                // TODO Should probably be an error
+                return Empty<IHierarchyObject>.Array;
+            }
         }
 
     }

@@ -30,6 +30,9 @@ using Carbonfrost.Commons.Shared.Runtime;
 using Carbonfrost.Commons.Shared.Runtime.Components;
 using Carbonfrost.Commons.Shared.Runtime.Conditions;
 
+#pragma warning disable 3003
+#pragma warning disable 3008
+
 namespace Prototypes {
 
     public class Alpha {

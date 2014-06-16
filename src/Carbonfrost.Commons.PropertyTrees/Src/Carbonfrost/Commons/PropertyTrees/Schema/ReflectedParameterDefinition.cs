@@ -50,26 +50,17 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return this.parameter.IsDefined(typeof(ParamArrayAttribute), false);
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override object DefaultValue {
             get {
                 return parameter.DefaultValue;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override bool IsOptional {
             get {
                 return parameter.IsOptional;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 
@@ -95,9 +86,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return parameter.ParameterType;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         // TODO Semantics of read-only and value aren't defined for parameters
@@ -106,25 +94,14 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return true;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
-        public override object GetValue(object component) {
+        public override object GetValue(object component, object ancestor, QualifiedName name) {
             return null;
         }
 
-        public override void SetValue(object component, QualifiedName name, object value) {
+        public override void SetValue(object component, object ancestor, QualifiedName name, object value) {
         }
-
-        public override object GetValue(object component, QualifiedName name) {
-            return null;
-        }
-
-        public override void SetValue(object component, object value) {
-        }
-
     }
 
 }

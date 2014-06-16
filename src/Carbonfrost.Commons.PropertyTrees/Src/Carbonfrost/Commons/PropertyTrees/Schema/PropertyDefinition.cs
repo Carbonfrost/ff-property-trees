@@ -25,11 +25,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
     public abstract class PropertyDefinition : PropertyNodeDefinition {
 
-        public abstract Type PropertyType { get; set; }
+        public abstract Type PropertyType { get; }
         public abstract TypeConverter Converter { get; }
-        public abstract bool IsReadOnly { get; set; }
-        public abstract bool IsOptional { get; set; }
-        public abstract object DefaultValue { get; set; }
+        public abstract bool IsReadOnly { get; }
+        public abstract bool IsOptional { get; }
+        public abstract object DefaultValue { get; }
         public abstract PropertyTreeDefinition DeclaringTreeDefinition { get; }
 
         public override string ToString() {
@@ -40,17 +40,17 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return false;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
+        }
+
+        public virtual bool IsExtender {
+            get {
+                return false;
             }
         }
 
         public virtual bool IsParamArray {
             get {
                 return false;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 
@@ -62,10 +62,28 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             visitor.VisitProperty(this);
         }
 
-        public abstract object GetValue(object component);
-        public abstract void SetValue(object component, object value);
-        public abstract object GetValue(object component, QualifiedName name);
-        public abstract void SetValue(object component, QualifiedName name, object value);
+        public object GetValue(object component) {
+            return GetValue(component, null, null);
+        }
+
+        public void SetValue(object component, object value) {
+            SetValue(component, null, null, value);
+        }
+
+        public object GetValue(object component, QualifiedName name) {
+            return GetValue(component, null, name);
+        }
+
+        public void SetValue(object component, QualifiedName name, object value) {
+            SetValue(component, null, name, value);
+        }
+
+        public abstract object GetValue(object component, object ancestor, QualifiedName name);
+        public abstract void SetValue(object component, object ancestor, QualifiedName name, object value);
+
+        public virtual bool CanExtend(Type extendeeType) {
+            return false;
+        }
 
         internal virtual PropertyDescriptor GetUnderlyingDescriptor() {
             return null;

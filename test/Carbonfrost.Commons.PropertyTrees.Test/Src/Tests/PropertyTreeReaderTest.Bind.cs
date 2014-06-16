@@ -453,6 +453,28 @@ namespace Tests {
             Assert.That(p[1].D, Is.EqualTo("Built-in add method"));
 
         }
+
+        [Test]
+        public void bind_should_invoke_ancestor_attached_property_context() {
+            PropertyTreeReader pt = LoadContent("control-extension-property.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var p = pt.Bind<Canvas>();
+
+            Assert.That(p.Controls[0]._Top, Is.EqualTo(40));
+            Assert.That(p.Controls[1]._Top, Is.EqualTo(80));
+        }
+
+        [Test]
+        public void bind_should_invoke_extension_method() {
+            PropertyTreeReader pt = LoadContent("control-extension-property-2.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var p = pt.Bind<Canvas>();
+
+            Assert.That(p.Controls[0]._Left, Is.EqualTo(132));
+            Assert.That(p.Controls[1]._Left, Is.EqualTo(66));
+        }
     }
 
 }

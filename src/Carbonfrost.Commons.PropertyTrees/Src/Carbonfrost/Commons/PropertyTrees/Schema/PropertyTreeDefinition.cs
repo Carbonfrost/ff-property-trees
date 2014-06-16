@@ -26,7 +26,6 @@ using Carbonfrost.Commons.Shared.Runtime;
 
 namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
-    [ConcreteClass(typeof(DynamicPropertyTreeDefinition))]
     public abstract class PropertyTreeDefinition : PropertyNodeDefinition {
 
         private readonly static IDictionary<Type, PropertyTreeDefinition> map = new Dictionary<Type, PropertyTreeDefinition>();
@@ -72,12 +71,19 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
         public abstract OperatorDefinition GetOperator(string name, bool declaredOnly = false);
         public abstract OperatorDefinition GetOperator(QualifiedName name, bool declaredOnly = false);
 
-        public PropertyDefinition GetProperty(string name, string ns, bool declaredOnly = false) {
-            return GetProperty(QualifiedName.Create(ns, name), declaredOnly);
+        public PropertyDefinition GetProperty(AttachedPropertyID name) {
+            if (name == null)
+                throw new ArgumentNullException("name");
+
+            return GetProperty(name.DeclaringType.GetQualifiedName().Namespace + Utility.GetExtenderName(name), GetPropertyOptions.IncludeExtenders);
         }
 
-        public abstract PropertyDefinition GetProperty(QualifiedName name, bool declaredOnly = false);
-        public abstract PropertyDefinition GetProperty(string name, bool declaredOnly = false);
+        public PropertyDefinition GetProperty(string name, string ns, GetPropertyOptions options = GetPropertyOptions.None) {
+            return GetProperty(QualifiedName.Create(ns, name), options);
+        }
+
+        public abstract PropertyDefinition GetProperty(QualifiedName name, GetPropertyOptions options = GetPropertyOptions.None);
+        public abstract PropertyDefinition GetProperty(string name, GetPropertyOptions options = GetPropertyOptions.None);
 
     }
 }

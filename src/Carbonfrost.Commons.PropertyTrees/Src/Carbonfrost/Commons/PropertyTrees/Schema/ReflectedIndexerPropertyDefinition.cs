@@ -60,17 +60,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return null;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override bool IsParamArray {
             get {
                 return false;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 
@@ -78,26 +72,17 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return this.member.PropertyType;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override bool IsIndexer {
             get {
                 return true;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override bool IsOptional {
             get {
                 return true;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 
@@ -129,25 +114,14 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return !this.member.CanWrite;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
-        public override object GetValue(object component) {
-            return GetValue(component, null);
-        }
-
-        public override void SetValue(object component, object value) {
-            SetValue(component, null, value);
-        }
-
-        public override void SetValue(object component, QualifiedName name, object value) {
-            member.SetValue(component, value, getIndexParams(name));
-        }
-
-        public override object GetValue(object component, QualifiedName name) {
+        public override object GetValue(object component, object ancestor, QualifiedName name) {
             return member.GetValue(component, getIndexParams(name));
+        }
+
+        public override void SetValue(object component, object ancestor, QualifiedName name, object value) {
+            member.SetValue(component, value, getIndexParams(name));
         }
 
     }

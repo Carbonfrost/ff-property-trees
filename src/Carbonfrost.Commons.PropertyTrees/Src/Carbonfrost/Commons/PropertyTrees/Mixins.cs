@@ -91,10 +91,13 @@ namespace Carbonfrost.Commons.PropertyTrees {
             return any.IsDefined(typeof(ExtensionAttribute), false);
         }
 
-        public static IEnumerable<T> ByLocalName<T>(this IEnumerable<T> items, string name)
+        public static IEnumerable<T> ByLocalName<T>(this IEnumerable<T> items, string name, bool attached = false)
             where T : PropertyNodeDefinition
         {
-            return items.Where(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase));
+            Func<T, string> nameGenerator = attached
+                ? (Func<T, string>) (t => t.Name.Substring(t.Name.IndexOf('.') + 1))
+                : (Func<T, string>) (t => t.Name);
+            return items.Where(t => string.Equals(nameGenerator(t), name, StringComparison.OrdinalIgnoreCase));
         }
 
         public static IEnumerable<Type> GetTypesHelper(this Assembly a) {

@@ -26,7 +26,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
     public abstract class OperatorDefinition : PropertyNodeDefinition {
 
         public abstract MethodBase UnderlyingMethod { get; }
-        public abstract OperatorType Operator { get; }
+        public abstract OperatorType OperatorType { get; }
         public abstract PropertyDefinitionCollection Parameters { get; }
         public abstract PropertyDefinition DefaultParameter { get; }
 

@@ -43,8 +43,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
             // TODO Implement property ordering based on [DependsOn]
             private bool Apply(PropertyTreeMetaObject target, PropertyTreeNavigator node) {
-                var member = target.SelectProperty(node.QualifiedName);
-
                 PropertyDefinition prop;
                 if (_allowDefault) {
                     prop = target.GetDefinition().DefaultProperty;
@@ -65,8 +63,20 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                                         PropertyTreeNavigator navigator,
                                         PropertyDefinition property)
             {
+                object ancestor = null;
+                PropertyTreeMetaObject ancestorMeta = null;
+
+                if (property.IsExtender) {
+                    var ancestorType = property.DeclaringTreeDefinition.SourceClrType;
+                    ancestorMeta = target.GetAncestors().Cast<PropertyTreeMetaObject>().FirstOrDefault(
+                        t => ancestorType.IsAssignableFrom(t.ComponentType));
+
+                    if (ancestorMeta != null)
+                        ancestor = ancestorMeta.Component;
+                }
+
                 var component = target.Component;
-                var value = property.GetValue(component, navigator.QualifiedName);
+                var value = property.GetValue(component, ancestor, navigator.QualifiedName);
                 var propertyType = property.PropertyType;
                 PropertyTreeMetaObject propertyTarget;
 
@@ -87,7 +97,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     Parent);
 
                 propertyTarget = navigator.TopLevelBind(propertyTarget, services);
-                target.BindSetMember(property, navigator.QualifiedName, propertyTarget, services);
+                target.BindSetMember(property, navigator.QualifiedName, propertyTarget, ancestorMeta, services);
             }
 
             public override PropertyTreeMetaObject EndStep(PropertyTreeMetaObject target) {

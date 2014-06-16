@@ -117,15 +117,19 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             }
         }
 
-        public override PropertyDefinition GetProperty(QualifiedName name, bool declaredOnly = false) {
+        public override PropertyDefinition GetProperty(QualifiedName name, GetPropertyOptions options) {
             PropertyDefinition result = this.Properties[name];
             if (result != null)
                 return result;
 
+            bool declaredOnly = options.HasFlag(GetPropertyOptions.DeclaredOnly);
             if (declaredOnly)
                 return null;
 
-            return EnumerateProperties().FirstOrDefault(t => Utility.OrdinalIgnoreCaseQualifiedName.Equals(t.QualifiedName, name));
+            var comparer = options.HasFlag(GetPropertyOptions.IncludeExtenders)
+                ? Utility.OrdinalIgnoreCaseQualifiedName
+                : Utility.AttachedOrdinalIgnoreCaseQualifiedName;
+            return EnumerateProperties().FirstOrDefault(t => comparer.Equals(t.QualifiedName, name));
         }
 
         public override OperatorDefinition GetOperator(QualifiedName name, bool declaredOnly = false) {
@@ -151,10 +155,13 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
             foreach (MethodInfo method in type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)) {
                 bool match = false;
-                // TODO Check signaure of these methods because they could be illegal
+                // TODO Check signature of these methods because they could be illegal
                 foreach (RoleAttribute attribute in FindRoleAttributes(method)) {
-                    this.operators.Add(attribute.BuildInstance(method));
-                    match = true;
+                    var result = attribute.BuildInstance(method);
+                    if (result != null) {
+                        this.operators.Add(result);
+                        match = true;
+                    }
                 }
 
                 if (match)
@@ -244,6 +251,10 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             this.operators.AddInternal(definition);
         }
 
+        internal void AddPropertyDefinition(ReflectedExtenderPropertyDefinition definition) {
+            this.properties.AddInternal(definition);
+        }
+
         void EnsureProperties() {
             if (this.properties == null) {
                 this.properties = new PropertyDefinitionCollection(
@@ -255,7 +266,30 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                     this.Properties.AddInternal(this.defaultProperty);
                 }
 
+                var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+                FindExtensionProperties(methods);
+
+                // Could define extender properties
+                ExtensionCache.Init(type.Assembly);
                 this.properties.MakeReadOnly();
+            }
+        }
+
+        void FindExtensionProperties(IEnumerable<MethodInfo> methods) {
+            var results = new Dictionary<AttachedPropertyID, ReflectedExtenderPropertyDefinition>();
+
+            foreach (var method in methods) {
+                foreach (var epa in method.GetCustomAttributes(typeof(ExtenderAttribute)).Cast<ExtenderAttribute>()) {
+                    var pid = epa.GetAttachedPropertyID(method);
+                    var current = results.GetValueOrCache(
+                        pid, _ => new ReflectedExtenderPropertyDefinition(pid));
+
+                    current.AddMethod(method);
+                }
+            }
+
+            foreach (var item in results.Values) {
+                this.properties.AddInternal(item);
             }
         }
 
@@ -277,9 +311,13 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                 && type.GetGenericTypeDefinition() == typeof(IAddChild<>)
                 && (arg = type.GetGenericArguments()[0]).IsProviderType()) {
 
-                // TODO If two operators are defined with the same name, trace an error (StatusAppender.ForType(PropertyTreeSchema))
                 foreach (var m in AppDomain.CurrentDomain.GetProviderMembers(arg)) {
-                    this.operators.Add(ReflectedProviderFactoryDefinitionBase.Create(arg, m));
+                    var item = ReflectedProviderFactoryDefinitionBase.Create(arg, m);
+                    if (this.operators.ContainsKey(item.QualifiedName)) {
+                        // TODO If two operators are defined with the same name, trace an error (StatusAppender.ForType(PropertyTreeSchema))
+                        continue;
+                    }
+                    this.operators.Add(item);
                 }
             }
         }
@@ -304,10 +342,12 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             return result;
         }
 
-        public override PropertyDefinition GetProperty(string name, bool declaredOnly) {
+        public override PropertyDefinition GetProperty(string name, GetPropertyOptions options) {
             // TODO Probably treat as ambiguous
+            bool declaredOnly = options.HasFlag(GetPropertyOptions.DeclaredOnly);
+            bool attached = options.HasFlag(GetPropertyOptions.IncludeExtenders);
             var props = declaredOnly ? this.Properties : EnumerateProperties();
-            return props.ByLocalName(name).FirstOrDefault();
+            return props.ByLocalName(name, attached).FirstOrDefault();
         }
 
         public override OperatorDefinition GetOperator(string name, bool declaredOnly) {

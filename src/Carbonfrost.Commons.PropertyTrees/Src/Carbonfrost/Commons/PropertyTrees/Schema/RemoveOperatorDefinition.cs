@@ -22,7 +22,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
     public abstract class RemoveOperatorDefinition : OperatorDefinition {
 
-        public sealed override OperatorType Operator {
+        public sealed override OperatorType OperatorType {
             get { return OperatorType.Remove; }
         }
 

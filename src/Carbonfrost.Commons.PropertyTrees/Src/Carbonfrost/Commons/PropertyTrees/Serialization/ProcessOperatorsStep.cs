@@ -51,7 +51,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     Type itemType = ((PropertyTreeFactoryDefinition) addon).OutputType;
                     // TODO Use service activation (we have the output type)
 
-                    var item = PropertyTreeMetaObject.Create(itemType);
+                    var item = target.CreateChild(itemType);
                     var model = navigator.TopLevelBind(item, null);
                     var args = new Dictionary<string, PropertyTreeMetaObject>
                     {
@@ -75,7 +75,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     Action<IReadOnlyDictionary<string, PropertyTreeMetaObject>> func;
                     var children = NodeList.Create(SelectChildren(navigator));
 
-                    switch (addon.Operator) {
+                    switch (addon.OperatorType) {
                         case OperatorType.Add:
                             func = args => {
                                 var child = target.BindAddChild(addon, args);

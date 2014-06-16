@@ -40,7 +40,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
         public override MethodBase UnderlyingMethod {
             get { return info.Method; } }
 
-        public override OperatorType Operator {
+        public override OperatorType OperatorType {
             get { return OperatorType.Clear; } }
 
         public override string Namespace {

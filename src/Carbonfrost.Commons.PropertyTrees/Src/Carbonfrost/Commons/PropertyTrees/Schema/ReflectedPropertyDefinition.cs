@@ -48,17 +48,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                 else
                     return dva.Value;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override bool IsOptional {
             get {
                 return true;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 
@@ -80,21 +74,18 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             }
         }
 
-        public override void SetValue(object component, object value) {
+        public override void SetValue(object component, object ancestor, QualifiedName name, object value) {
             property.SetValue(component, value);
+        }
+
+        public override object GetValue(object component, object ancestor, QualifiedName name) {
+            return property.GetValue(component);
         }
 
         public override Type PropertyType {
             get {
                 return property.PropertyType;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
-        }
-
-        public override object GetValue(object component) {
-            return property.GetValue(component);
         }
 
         public override TypeConverter Converter {
@@ -107,17 +98,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return property.IsReadOnly;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
-        public override void SetValue(object component, QualifiedName name, object value) {
-            SetValue(component, value);
-        }
-
-        public override object GetValue(object component, QualifiedName name) {
-            return GetValue(component);
-        }
     }
 }

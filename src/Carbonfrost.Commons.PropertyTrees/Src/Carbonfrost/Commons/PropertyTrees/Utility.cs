@@ -36,6 +36,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
         public static readonly IUriContext NullUriContext = new NullUriContextImpl();
 
         public static readonly IEqualityComparer<QualifiedName> OrdinalIgnoreCaseQualifiedName = new OrdinalIgnoreCaseQualifiedNameImpl();
+        public static readonly IEqualityComparer<QualifiedName> AttachedOrdinalIgnoreCaseQualifiedName = new AttachedOrdinalIgnoreCaseQualifiedNameImpl();
 
         static readonly HashSet<Type> PROPERTY_TYPES = new HashSet<Type> {
             typeof(Uri), typeof(TimeSpan), typeof(DateTimeOffset),
@@ -151,6 +152,30 @@ namespace Carbonfrost.Commons.PropertyTrees {
             }
         }
 
+        sealed class AttachedOrdinalIgnoreCaseQualifiedNameImpl : IEqualityComparer<QualifiedName> {
+
+            static string GenerateName(QualifiedName name) {
+                var localName = name.LocalName;
+                int dot = localName.IndexOf('.');
+                return localName.Substring(dot + 1);
+            }
+
+            public bool Equals(QualifiedName x, QualifiedName y) {
+                return (x == y) || (x.Namespace == y.Namespace && string.Equals(GenerateName(x), GenerateName(y), StringComparison.OrdinalIgnoreCase));
+            }
+
+            public int GetHashCode(QualifiedName obj) {
+                int hashCode = 0;
+
+                unchecked {
+                    hashCode += 1000000009 * GenerateName(obj).ToLowerInvariant().GetHashCode();
+                    hashCode += 1000000021 * obj.Namespace.GetHashCode();
+                }
+
+                return hashCode;
+            }
+        }
+
         public static IXmlLineInfo CreateLineInfo(int lineNumber, int linePosition) {
             return new SimpleLineInfo { LineNumber = lineNumber, LinePosition = linePosition };
         }
@@ -169,6 +194,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 displayName = string.Format("{1} ({0})", ns, name);
             }
             return displayName;
+        }
+
+        public static string GetExtenderName(AttachedPropertyID name) {
+            return string.Concat(name.DeclaringType.Name, ".", name.PropertyName);
         }
     }
 }

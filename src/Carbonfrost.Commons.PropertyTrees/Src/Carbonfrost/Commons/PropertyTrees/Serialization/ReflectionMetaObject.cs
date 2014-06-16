@@ -52,7 +52,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             var result = definition.Apply(null, component, arguments);
             if (result == null)
                 return Null;
-            return PropertyTreeMetaObject.Create(result);
+            return CreateChild(result);
         }
 
         public override PropertyTreeMetaObject BindStreamingSource(StreamContext input, IServiceProvider serviceProvider) {
@@ -77,17 +77,27 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             definition.Apply(null, component, arguments);
         }
 
-        public override void BindSetMember(PropertyDefinition property, QualifiedName name, PropertyTreeMetaObject value, IServiceProvider serviceProvider) {
+        public override void BindSetMember(PropertyDefinition property, QualifiedName name, PropertyTreeMetaObject value, PropertyTreeMetaObject ancestor, IServiceProvider serviceProvider) {
             if (property.IsReadOnly) {
                 TryAggregation(value, name, property, serviceProvider);
                 return;
             }
 
             object outputValue = value.Component;
-            var callback = serviceProvider.TryGetService(PopulateComponentCallback.Null);
+            object anc = ancestor == null ? null : ancestor.Component;
+            SetValueCore(property, name, anc, value, outputValue, serviceProvider);
+        }
 
+        private void SetValueCore(PropertyDefinition property,
+                                  QualifiedName name,
+                                  object ancestor,
+                                  PropertyTreeMetaObject value,
+                                  object outputValue,
+                                  IServiceProvider serviceProvider) {
+
+            var callback = serviceProvider.TryGetService(PopulateComponentCallback.Null);
             try {
-                property.SetValue(component, name, value.Component);
+                property.SetValue(component, ancestor, name, value.Component);
 
             } catch (NullReferenceException nre) {
                 // Normally a "critical" exception, consider it a conversion error
@@ -99,7 +109,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             } catch (Exception ex) {
                 if (Require.IsCriticalException(ex))
                     throw;
-
                 callback.OnConversionException(property.Name, outputValue, ex);
             }
         }

@@ -21,9 +21,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using Carbonfrost.Commons.ComponentModel;
+using Carbonfrost.Commons.PropertyTrees;
 using Carbonfrost.Commons.Shared.Runtime;
 
 [assembly: Provides(typeof(Prototypes.Control))]
+
+#pragma warning disable 3003
+#pragma warning disable 3008
 
 namespace Prototypes {
 
@@ -45,6 +49,10 @@ namespace Prototypes {
         }
 
         public void AddText(string text) {}
+
+        public int _Top { get; set; }
+        public int _Left { get; set; }
+        public Canvas _Canvas { get; set; }
     }
 
     [Provider(typeof(Control), Name = "compose")]
@@ -56,4 +64,23 @@ namespace Prototypes {
 
     [Provider(typeof(Control), Name = "textbox")]
     public class TextBox : Control {}
+
+    [Provider(typeof(Control), Name = "canvas")]
+    public class Canvas : Control {
+
+        [Extender]
+        public void SetTop(Control control, int top) {
+            control._Top = top;
+            control._Canvas = this;
+        }
+    }
+
+    public static class ControlExtensions {
+
+        [Extender]
+        public static void SetLeft(this Control control, int left) {
+            control._Left = left;
+        }
+    }
+
 }

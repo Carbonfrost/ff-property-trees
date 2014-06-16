@@ -96,6 +96,43 @@ namespace Tests.Schema {
             Assert.That(fac, Is.Not.Null);
         }
 
+        [Test]
+        public void get_extender_property_nominal() {
+            var def = PropertyTreeDefinition.FromType(typeof(Canvas));
+            var fac = def.GetProperty("Canvas.top");
+
+            Assert.That(fac, Is.Not.Null);
+            Assert.True(fac.IsExtender);
+            Assert.True(fac.CanExtend(typeof(Control)));
+        }
+
+        [Test]
+        public void get_extender_property_extension_method() {
+            var def = PropertyTreeDefinition.FromType(typeof(Control));
+            var fac = def.GetProperty("ControlExtensions.left");
+
+            Assert.That(fac, Is.Not.Null);
+            Assert.True(fac.IsExtender);
+            Assert.True(fac.CanExtend(typeof(Paragraph)));
+
+            // Look for type inheritance
+            def = PropertyTreeDefinition.FromType(typeof(Paragraph));
+            var other = def.GetProperty("ControlExtensions.left");
+            Assert.That(other, Is.SameAs(fac));
+        }
+
+        [Test]
+        public void get_extender_property_extension_method_inherit() {
+            var def = PropertyTreeDefinition.FromType(typeof(Paragraph));
+            var fac = def.GetProperty("left", GetPropertyOptions.IncludeExtenders);
+
+            Assert.That(fac, Is.Not.Null);
+            Assert.True(fac.IsExtender);
+            Assert.True(fac.CanExtend(typeof(Paragraph)));
+        }
+
+        // TODO Test generics, including open generics
+
         class GenericList {
 
             [Add(Name = "s")]

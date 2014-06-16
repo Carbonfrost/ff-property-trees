@@ -52,8 +52,8 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             return new BuilderMetaObject(inner.BindConstructor(definition, arguments));
         }
 
-        public override void BindSetMember(PropertyDefinition property, QualifiedName name, PropertyTreeMetaObject value, IServiceProvider serviceProvider) {
-            inner.BindSetMember(property, name, value, serviceProvider);
+        public override void BindSetMember(PropertyDefinition property, QualifiedName name, PropertyTreeMetaObject value, PropertyTreeMetaObject ancestor, IServiceProvider serviceProvider) {
+            inner.BindSetMember(property, name, value, ancestor, serviceProvider);
         }
     }
 }
