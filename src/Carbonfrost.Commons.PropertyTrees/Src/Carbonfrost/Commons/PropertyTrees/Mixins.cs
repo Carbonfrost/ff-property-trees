@@ -88,7 +88,8 @@ namespace Carbonfrost.Commons.PropertyTrees {
         }
 
         public static bool IsExtension(this ICustomAttributeProvider any) {
-            return any.IsDefined(typeof(ExtensionAttribute), false);
+            return any.IsDefined(typeof(ExtensionAttribute), false)
+                || any.IsDefined(typeof(ExtenderAttribute), false);
         }
 
         public static IEnumerable<T> ByLocalName<T>(this IEnumerable<T> items, string name, bool attached = false)

@@ -25,7 +25,9 @@ using Carbonfrost.Commons.ComponentModel;
 
 namespace Carbonfrost.Commons.PropertyTrees {
 
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method
+                    | AttributeTargets.Class
+                    | AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
     public sealed class ExtenderAttribute : RoleAttribute {
 
         static readonly Regex PATTERN = new Regex(@"^(Get|Set)");

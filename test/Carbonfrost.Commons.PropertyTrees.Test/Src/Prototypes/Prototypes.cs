@@ -191,22 +191,16 @@ namespace Prototypes {
     public class Beta {
 
         // TODO Should ALpha be implicitly created like in XRMS?
+        private readonly IDictionary<string, Alpha> g = new Dictionary<string, Alpha>();
 
         public Alpha A { get; set; }
         public Gamma B { get; set; }
         public Uri C { get; set; }
-        string d;
-        public string D {
-            get {
-                return d;
-            }
-            set {
-                d = value;
-            }
-        }
+        public string D { get; set; }
 
         public Gamma E { get; set; }
         public Properties F { get; set; }
+        public IDictionary<string, Alpha> G { get { return g; } }
 
         // Should be treated as a property and not a streaming source
         public string Source { get; set; }

@@ -438,6 +438,17 @@ namespace Tests {
         }
 
         [Test]
+        public void bind_dictionary_access_kvp_syntax() {
+            PropertyTreeReader pt = LoadContent("beta-5.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            Beta p = pt.Bind<Beta>();
+            Assert.That(p.G["gu"].E, Is.EqualTo(new DateTime(2011, 3, 30, 1, 50, 00)));
+            Assert.That(p.G["gu"].F, Is.EqualTo(10.5000));
+            Assert.That(p.G["gu"].G, Is.EqualTo(10.5));
+        }
+
+        [Test]
         public void bind_should_apply_explicit_factory_names() {
             PropertyTreeReader pt = LoadContent("beta-list.xml");
             Assume.That(pt.Read(), Is.True);
