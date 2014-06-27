@@ -96,17 +96,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return string.Empty;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override string Name {
             get {
                 return this.member.Name;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 

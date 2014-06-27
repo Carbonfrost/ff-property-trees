@@ -32,6 +32,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         internal PropertyTree parent;
         internal IDictionary<string, string> prefixMap;
+        internal bool isExpressNamespace;
 
         public abstract PropertyNodeCollection Children { get; }
 
@@ -89,6 +90,16 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         public int LineNumber { get; set; }
         public int LinePosition { get; set; }
+
+        bool IPropertyTreeNavigator.IsExpressNamespace {
+            get { return IsExpressNamespace; }
+        }
+
+        internal virtual bool IsExpressNamespace {
+            get {
+                return this.isExpressNamespace;
+            }
+        }
 
         protected internal abstract void AcceptVisitor(PropertyTreeVisitor visitor);
         protected internal abstract TResult AcceptVisitor<TArgument, TResult>(PropertyTreeVisitor<TArgument, TResult> visitor, TArgument argument);

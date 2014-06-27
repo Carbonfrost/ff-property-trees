@@ -93,17 +93,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return TypeHelper.GetNamespaceName(_name.DeclaringType);
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override string Name {
             get {
                 return Utility.GetExtenderName(_name);
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 

@@ -50,7 +50,8 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                         return false;
 
                 } else {
-                    prop = target.SelectProperty(node.QualifiedName);
+                    var im = ImpliedName(node, target);
+                    prop = target.SelectProperty(im);
                     if (prop == null || prop.IsIndexer)
                         return false;
                 }
@@ -76,17 +77,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 }
 
                 var component = target.Component;
-                var value = property.GetValue(component, ancestor, navigator.QualifiedName);
-                var propertyType = property.PropertyType;
-                PropertyTreeMetaObject propertyTarget;
-
-                // Refine property type if possible
-                if (value == null) {
-                    propertyTarget = PropertyTreeMetaObject.Create(propertyType);
-                }
-                else {
-                    propertyTarget = PropertyTreeMetaObject.Create(value, propertyType);
-                }
+                PropertyTreeMetaObject propertyTarget = target.CreateChild(property, navigator.QualifiedName, ancestorMeta);
 
                 var services = ServiceProvider.Compose(
                     new PropertyBindContext(component, property)

@@ -24,7 +24,7 @@ using System.Collections.Generic;
 namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
     class NullPropertyTreeBinderErrors : IPropertyTreeBinderErrors {
-
+        public void CouldNotBindGenericParameters(Type componentType, Exception ex, FileLocation loc) {}
         public void BadAddChild(Type parentType, Exception ex, FileLocation loc) {}
         public void CouldNotBindStreamingSource(Type componentType, FileLocation loc) {}
         public void DuplicatePropertyName(IEnumerable<QualifiedName> duplicates,

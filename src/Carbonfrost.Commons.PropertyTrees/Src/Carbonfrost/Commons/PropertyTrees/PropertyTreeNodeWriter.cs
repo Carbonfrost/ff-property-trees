@@ -39,6 +39,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
         private bool started;
         private IXmlLineInfo lineInfo;
         private IDictionary<string, string> prefixMap;
+        private bool isExpressNamespace;
 
         public PropertyTree Root {
             get {
@@ -143,6 +144,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
         public override void Flush() {
         }
 
+        internal override void SetExpressNamespace(bool isExpressNamespace) {
+            this.isExpressNamespace = isExpressNamespace;
+        }
+
         internal override void SetLineInfo(IXmlLineInfo lineInfo, IDictionary<string, string> prefixMap) {
             this.lineInfo = lineInfo;
             this.prefixMap = prefixMap;
@@ -172,6 +177,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 node.LineNumber = lineInfo.LineNumber;
             }
             node.prefixMap = this.prefixMap;
+            node.isExpressNamespace = this.isExpressNamespace;
         }
     }
 }

@@ -104,6 +104,7 @@ namespace Tests.Schema {
             Assert.That(fac, Is.Not.Null);
             Assert.True(fac.IsExtender);
             Assert.True(fac.CanExtend(typeof(Control)));
+            Assert.That(fac.Namespace, Is.EqualTo("https://ns.example.com/"));
         }
 
         [Test]
@@ -114,6 +115,7 @@ namespace Tests.Schema {
             Assert.That(fac, Is.Not.Null);
             Assert.True(fac.IsExtender);
             Assert.True(fac.CanExtend(typeof(Paragraph)));
+            Assert.That(fac.Namespace, Is.EqualTo("https://ns.example.com/"));
 
             // Look for type inheritance
             def = PropertyTreeDefinition.FromType(typeof(Paragraph));
@@ -129,6 +131,7 @@ namespace Tests.Schema {
             Assert.That(fac, Is.Not.Null);
             Assert.True(fac.IsExtender);
             Assert.True(fac.CanExtend(typeof(Paragraph)));
+            Assert.That(fac.Namespace, Is.EqualTo("https://ns.example.com/"));
         }
 
         // TODO Test generics, including open generics

@@ -100,20 +100,14 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public override string Namespace {
             get {
-                var nn = type.GetQualifiedName();
-                return nn.NamespaceName;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
+                var nn = Utility.GetXmlnsNamespaceSafe(type);
+                return nn == null ? string.Empty : nn.NamespaceName;
             }
         }
 
         public override string Name {
             get {
                 return type.Name;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 
@@ -144,10 +138,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                 return null;
 
             return EnumerateOperators().FirstOrDefault(t => Utility.OrdinalIgnoreCaseQualifiedName.Equals(t.QualifiedName, name));
-        }
-
-        private IEnumerable<Type> EnumerateInheritedTypes() {
-            return Utility.EnumerateInheritedTypes(this.SourceClrType);
         }
 
         private void FindAllOperators(Type type) {
@@ -324,8 +314,8 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public override IEnumerable<PropertyDefinition> EnumerateProperties(bool declaredOnly = false) {
             IEnumerable<PropertyDefinition> result = this.Properties;
-            foreach (var t in EnumerateInheritedTypes()) {
-                var ops = PropertyTreeDefinition.FromType(t).Properties;
+            foreach (var t in BaseTypes) {
+                var ops = t.Properties;
                 result = result.Concat(ops);
             }
 
@@ -334,8 +324,8 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public override IEnumerable<OperatorDefinition> EnumerateOperators(bool declaredOnly = false) {
             IEnumerable<OperatorDefinition> result = this.Operators;
-            foreach (var t in EnumerateInheritedTypes()) {
-                var ops = PropertyTreeDefinition.FromType(t).Operators;
+            foreach (var t in BaseTypes) {
+                var ops = t.Operators;
                 result = result.Concat(ops);
             }
 

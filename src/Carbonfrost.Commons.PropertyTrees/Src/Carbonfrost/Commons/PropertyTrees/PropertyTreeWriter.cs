@@ -161,10 +161,12 @@ namespace Carbonfrost.Commons.PropertyTrees {
         public abstract void Flush();
 
         internal virtual void SetLineInfo(IXmlLineInfo lineInfo, IDictionary<string, string> prefixMap) {}
+        internal virtual void SetExpressNamespace(bool isExpressNamespace) {}
 
         internal bool CopyCurrent(PropertyTreeReader reader) {
             if (reader.MoveToContent()) {
                 SetLineInfo(reader as IXmlLineInfo ?? Utility.NullLineInfo, reader.PrefixMap);
+                SetExpressNamespace(reader.IsExpressNamespace);
 
                 switch (reader.NodeType) {
                     case PropertyNodeType.Property:

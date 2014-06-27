@@ -65,7 +65,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             }
 
             public override IEnumerable<PropertyTreeNavigator> Rest() {
-                 if (_cleared)
+                if (_cleared)
                     yield break;
 
                 int index = 0;

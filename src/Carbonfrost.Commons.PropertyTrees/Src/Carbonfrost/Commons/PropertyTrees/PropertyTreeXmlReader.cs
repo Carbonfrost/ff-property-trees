@@ -41,6 +41,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
             public int _depth;
             public string _value;
             public int _position;
+            public bool _express;
 
             public IDictionary<string, string> prefixMap;
 
@@ -106,6 +107,12 @@ namespace Carbonfrost.Commons.PropertyTrees {
             }
         }
 
+        internal override bool IsExpressNamespace {
+            get {
+                return Peek()._express;
+            }
+        }
+
         public override PropertyNodeType NodeType {
             get {
                 return Peek()._nodeType;
@@ -152,6 +159,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
             result._value = reader.Value;
             result._name = reader.LocalName;
             result._namespace = reader.NamespaceURI;
+            result._express = reader.Prefix.Length > 0;
             result.LineNumber = readerLineInfoCache.LineNumber;
             result.LinePosition = readerLineInfoCache.LinePosition;
 

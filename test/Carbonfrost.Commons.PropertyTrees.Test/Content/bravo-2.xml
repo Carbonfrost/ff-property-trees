@@ -1,0 +1,11 @@
+<!-- Though bravo is in a NS, all properties and operators should
+     bind to their declaring types -->
+<bravo xmlns="https://ns.example.com/">
+    <components>
+        <!-- Technically, type attribute is in the wrong namespace
+             to use the add-on, but we transparently handle it -->
+        <component type="assembly"
+                   name="Carbonfrost.Commons.SharedRuntime" />
+
+    </components>
+</bravo>

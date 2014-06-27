@@ -176,6 +176,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
             return Failure.Prepare(new PropertyTreeException(SR.CouldNotBindStreamingSource(type), null, loc));
         }
 
+        public static PropertyTreeException CouldNotBindGenericParameters(Type type, Exception ex, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.CouldNotBindGenericParameters(type), ex, loc));
+        }
+
         public static PropertyTreeException NoTargetProviderMatches(Type type, FileLocation loc) {
             return Failure.Prepare(new PropertyTreeException(SR.NoTargetProviderMatches(type), null, loc));
         }
@@ -186,6 +190,15 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         public static PropertyTreeException BadAddChild(Type parentType, Exception ex, FileLocation loc) {
             return Failure.Prepare(new PropertyTreeException(SR.BadAddChild(parentType), ex, loc));
+        }
+
+        public static InvalidOperationException UnableToMatchTypeNameAmbiguous(string name, IEnumerable<object> list) {
+            string listText = string.Join(", ", list);
+            return Failure.Prepare(new InvalidOperationException(SR.UnableToMatchTypeNameAmbiguous(name, listText)));
+        }
+
+        public static InvalidOperationException UnableToMatchTypeNameZero(string name) {
+            return Failure.Prepare(new InvalidOperationException(SR.UnableToMatchTypeNameZero(name)));
         }
     }
 

@@ -88,11 +88,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public override string Namespace {
             get { return info.Namespace; }
-            set { throw Failure.ReadOnlyProperty(); } }
+        }
 
         public override string Name {
             get { return info.Name; }
-            set { throw Failure.ReadOnlyProperty(); } }
+        }
 
         public override string ToString() {
             return OutputType.ToString();

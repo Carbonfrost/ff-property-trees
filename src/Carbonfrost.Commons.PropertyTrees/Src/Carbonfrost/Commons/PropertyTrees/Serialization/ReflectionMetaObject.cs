@@ -126,7 +126,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             }
         }
 
-        private static MethodInfo FindAddonMethod(Type type, IEnumerable enumerable) {
+        internal static MethodInfo FindAddonMethod(Type type, IEnumerable enumerable) {
             var bestItemTypes = GetBestItemTypes(enumerable);
 
             foreach (var itemType in bestItemTypes) {
@@ -164,7 +164,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     }
                 }
             }
-            return;
         }
 
         public override PropertyTreeMetaObject BindInitializeValue(string text, IServiceProvider serviceProvider) {

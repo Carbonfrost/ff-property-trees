@@ -36,6 +36,16 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         internal virtual IDictionary<string, string> PrefixMap { get { return null; } }
 
+        bool IPropertyTreeNavigator.IsExpressNamespace {
+            get { return IsExpressNamespace; }
+        }
+
+        internal virtual bool IsExpressNamespace {
+            get {
+                return false;
+            }
+        }
+
         public abstract ReadState ReadState { get; }
         public abstract bool Read();
 

@@ -1,5 +1,5 @@
 //
-// - ApplyConstructorStep.cs -
+// - PushPropertyCommand.cs -
 //
 // Copyright 2014 Carbonfrost Systems, Inc. (http://carbonfrost.com)
 //
@@ -21,32 +21,34 @@ using System.Collections.Generic;
 using System.Linq;
 using Carbonfrost.Commons.Shared;
 using Carbonfrost.Commons.PropertyTrees.Schema;
+using Carbonfrost.Commons.PropertyTrees.Serialization;
 
 namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
-    partial class PropertyTreeBinderImpl {
+    partial class TemplateMetaObject {
 
-        class ApplyConstructorStep : PropertyTreeBinderStep {
+        class PushPropertyCommand : ITemplateCommand {
 
-            public override PropertyTreeMetaObject StartStep(PropertyTreeMetaObject target, PropertyTreeNavigator self, NodeList children) {
-                QualifiedName name = self.QualifiedName;
-                var ctor = PropertyTreeDefinition.FromType(target.ComponentType).Constructor;
+            readonly PropertyDefinition property;
+            readonly QualifiedName name;
 
-                if (target.ShouldConstruct && ctor != null) {
-                    OperatorDefinition op = ctor;
-                    var args = ExtractParameterDictionary(op, target, Parent.GetBasicServices(self), children);
+            public PushPropertyCommand(PropertyDefinition property, QualifiedName name) {
+                this.property = property;
+                this.name = name;
+            }
 
-                    target = target.BindConstructor(ctor, args);
+            void ITemplateCommand.Apply(Stack<object> values) {
+                var component = values.Peek();
+                var existing = property.GetValue(component, name);
+                if (existing == null) {
+                    throw new NotImplementedException();
                 }
 
-                return target;
+                values.Push(existing);
             }
-
-            public override PropertyTreeMetaObject EndStep(PropertyTreeMetaObject target) {
-                return target;
-            }
-
         }
-    }
 
+    }
 }
+
+

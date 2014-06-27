@@ -30,6 +30,21 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
         public abstract PropertyDefinitionCollection Parameters { get; }
         public abstract PropertyDefinition DefaultParameter { get; }
 
+        public Type ReturnType {
+            get {
+                if (DefaultParameter == null) {
+                    var mi = UnderlyingMethod as MethodInfo;
+
+                    if (mi == null) {
+                        return ((ConstructorInfo) UnderlyingMethod).DeclaringType;
+                    } else {
+                        return mi.ReturnType;
+                    }
+                } else
+                    return DefaultParameter.PropertyType;
+            }
+        }
+
         internal object Apply(object component, object parent, IReadOnlyDictionary<string, PropertyTreeMetaObject> parameters) {
             // TODO Consider checking for the type instead of instantiating adapter (performance)
             return Apply(component, parent, new MetaArgumentAdapter(parameters));

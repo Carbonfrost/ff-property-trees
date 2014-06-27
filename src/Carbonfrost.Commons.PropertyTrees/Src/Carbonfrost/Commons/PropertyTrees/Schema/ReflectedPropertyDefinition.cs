@@ -60,17 +60,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return TypeHelper.GetNamespaceName(property.ComponentType);
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override string Name {
             get {
                 return property.Name;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 

@@ -1,0 +1,13 @@
+<bravo>
+    <components>
+        <!-- The following are equivalent.  The first
+             add-on is in the same XMLNS as bravo, but should
+             be transparently handled in its real namespace-->
+        <component type="assembly"
+                   name="Carbonfrost.Commons.SharedRuntime" />
+
+        <component xmlns="http://ns.carbonfrost.com/commons/sharedruntime"
+                   type="assembly"
+                   name="Carbonfrost.Commons.SharedRuntime" />
+    </components>
+</bravo>

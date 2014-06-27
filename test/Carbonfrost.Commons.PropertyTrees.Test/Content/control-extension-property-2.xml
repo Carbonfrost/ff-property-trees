@@ -1,4 +1,4 @@
-<canvas>
+<canvas xmlns="https://ns.example.com/">
     <p ControlExtensions.left="132"></p>
     <p left="66"></p>
 </canvas>

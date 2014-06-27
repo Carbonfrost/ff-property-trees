@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Carbonfrost.Commons.Shared;
+using Carbonfrost.Commons.Shared.Runtime;
 using Carbonfrost.Commons.PropertyTrees.Schema;
 
 namespace Carbonfrost.Commons.PropertyTrees.Serialization {
@@ -34,7 +35,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             }
 
             private bool Apply(PropertyTreeMetaObject target, PropertyTreeNavigator node) {
-                var member = target.SelectOperator(node.QualifiedName);
+                var member = target.SelectOperator(ImpliedName(node, target));
 
                 if (member != null) {
                     DoOperatorBind(target, node, member);
@@ -80,7 +81,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                             func = args => {
                                 var child = target.BindAddChild(addon, args);
 
-                                if (child.Component != null) {
+                                if (child.ShouldBindChildren) {
                                     Parent.BindChildNodes(child, navigator, children);
                                 }
                             };

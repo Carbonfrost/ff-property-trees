@@ -45,11 +45,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public override string Namespace {
             get { return info.Namespace; }
-            set { throw Failure.ReadOnlyProperty(); } }
+        }
 
         public override string Name {
             get { return info.Name; }
-            set { throw Failure.ReadOnlyProperty(); } }
+        }
 
         public override object Apply(object component, object parent, IReadOnlyDictionary<string, object> parameters) {
             var parms = MapParameters(UnderlyingMethod, parent, parameters);

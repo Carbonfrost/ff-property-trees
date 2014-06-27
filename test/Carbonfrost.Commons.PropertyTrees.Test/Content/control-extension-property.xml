@@ -1,4 +1,4 @@
-<canvas>
+<canvas xmlns="https://ns.example.com/">
     <p top="40"></p>
     <p Canvas.top="80"></p>
 </canvas>

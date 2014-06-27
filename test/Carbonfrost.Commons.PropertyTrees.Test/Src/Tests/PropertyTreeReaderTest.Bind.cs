@@ -320,9 +320,6 @@ namespace Tests {
             Assume.That(pt.Read(), Is.True);
 
             // Add methods defined on the type and defined via an extension method
-            var tree = PropertyTreeDefinition.FromType(typeof(Omicron));
-            var ops = tree.Operators;
-
             Omicron o = pt.Bind<Omicron>();
             Assert.That(o.A.A, Is.True);
             Assert.That(o.A.AA.HasValue, Is.False);
@@ -485,6 +482,28 @@ namespace Tests {
 
             Assert.That(p.Controls[0]._Left, Is.EqualTo(132));
             Assert.That(p.Controls[1]._Left, Is.EqualTo(66));
+        }
+
+        [Test]
+        public void bind_should_transparently_handle_implied_operator_ns() {
+            PropertyTreeReader pt = LoadContent("bravo-1.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var p = pt.Bind<Bravo>();
+
+            Assert.That(p.Components[0].Type, Is.EqualTo("assembly"));
+            Assert.That(p.Components[0].Name.Name, Is.EqualTo("Carbonfrost.Commons.SharedRuntime"));
+        }
+
+        [Test]
+        public void bind_should_transparently_handle_implied_parameter_ns() {
+            PropertyTreeReader pt = LoadContent("bravo-2.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var p = pt.Bind<Bravo>();
+
+            Assert.That(p.Components[0].Type, Is.EqualTo("assembly"));
+            Assert.That(p.Components[0].Name.Name, Is.EqualTo("Carbonfrost.Commons.SharedRuntime"));
         }
     }
 

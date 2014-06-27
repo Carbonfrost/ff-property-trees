@@ -28,6 +28,8 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
         void BadAddChild(Type parentType, Exception ex, FileLocation loc);
         void CouldNotBindStreamingSource(Type componentType, FileLocation loc);
+		void CouldNotBindGenericParameters(Type componentType, Exception ex, FileLocation loc);
+
         void DuplicatePropertyName(IEnumerable<QualifiedName> duplicates,
                                    FileLocation loc);
         void RequiredPropertiesMissing(IEnumerable<string> requiredMissing,

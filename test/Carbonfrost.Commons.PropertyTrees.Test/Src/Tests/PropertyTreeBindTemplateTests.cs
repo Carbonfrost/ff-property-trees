@@ -17,6 +17,7 @@
 //
 
 using System;
+using System.Globalization;
 using Carbonfrost.Commons.PropertyTrees;
 using Carbonfrost.Commons.Shared;
 using Carbonfrost.Commons.Shared.Runtime;
@@ -25,6 +26,7 @@ using Prototypes;
 using Tests;
 
 namespace Tests {
+
 
     [TestFixture]
     public class PropertyTreeBindTemplateTests : TestBase {
@@ -62,5 +64,88 @@ namespace Tests {
             Assert.That(a.U, Is.EqualTo(typeof(Glob)));
         }
 
+        [Test]
+        public void bind_template_complex_types_readonly_accessor() {
+            PropertyTreeReader pt = LoadContent("beta-6.xml");
+            Assume.That(pt.Read(), Is.True);
+            var template = pt.Bind<ITemplate<Beta>>();
+            var b = new Beta();
+            template.Initialize(b);
+
+            Assert.That(b.H.A, Is.True);
+            Assert.That(b.A.AA.HasValue, Is.False);
+            Assert.That(b.H.B, Is.EqualTo(10));
+            Assert.That(b.H.BB.HasValue, Is.True);
+            Assert.That(b.H.D, Is.EqualTo('g'));
+            Assert.That(b.H.E, Is.EqualTo(DateTime.Parse("3/30/2011 1:50 AM")));
+        }
+
+        [Test]
+        public void bind_template_add_method_factory_extension_no_parameters() {
+            PropertyTreeReader pt = LoadContent("omicron-2.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var tmpl = pt.Bind<ITemplate<Omicron>>();
+            Omicron o = new Omicron();
+            tmpl.Initialize(o);
+
+            Assert.That(o.G.A, Is.EqualTo(CultureInfo.GetCultureInfo("fr-FR")));
+        }
+
+        [Test]
+        public void bind_template_untyped_transition() {
+            // The property return type ITemplate gets constructed as a
+            // typed version
+            PropertyTreeReader pt = LoadContent("iota-chi-3.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var template = pt.Bind<IotaChi>().Template;
+            var a = new Alpha();
+            template.Initialize(a);
+
+            Assert.That(template, Is.InstanceOf<ITemplate<Alpha>>());
+            Assert.That(a.I, Is.EqualTo(1024));
+            Assert.That(a.J, Is.EqualTo(102410241024));
+            Assert.That(a.K, Is.EqualTo(-120));
+            Assert.That(a.L, Is.EqualTo(float.NaN));
+        }
+
+        [Test]
+        public void bind_template_add_method_factories() {
+            PropertyTreeReader pt = LoadContent("omicron.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var template = pt.Bind<ITemplate<Omicron>>();
+            Omicron o = new Omicron();
+            template.Initialize(o);
+
+            Assert.That(o.A.A, Is.True);
+            Assert.That(o.A.AA.HasValue, Is.False);
+            Assert.That(o.A.B, Is.EqualTo(0));
+            Assert.That(o.A.BB.HasValue, Is.True);
+            Assert.That(o.A.D, Is.EqualTo('g'));
+            Assert.That(o.A.E, Is.EqualTo(DateTime.Parse("3/30/2011 1:50 AM")));
+
+            Assert.That(o.B.C, Is.EqualTo(new Uri("http://carbonfrost.com")));
+            Assert.That(o.B.D, Is.EqualTo("Generic text"));
+            Assert.That(o.B.A.A, Is.EqualTo(true));
+
+            Assert.That(o.G.A, Is.EqualTo(CultureInfo.GetCultureInfo("en-US")));
+        }
+
+        [Test]
+        public void bind_template_add_range_property() {
+            PropertyTreeReader pt = LoadContent("psi-add-range.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            Psi p = new Psi();
+			var template = pt.Bind<ITemplate<Psi>>();
+			template.Initialize(p);
+
+            Assert.That(p.B.Count, Is.EqualTo(4));
+            Assert.That(p.B[0], Is.EqualTo("a"));
+            Assert.That(p.B[2], Is.EqualTo("c"));
+            Assert.That(p.B[3], Is.EqualTo("d"));
+        }
     }
 }

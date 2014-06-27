@@ -1,5 +1,5 @@
 //
-// - ApplyDefaultConstructorStep.cs -
+// - IPropertyNameLookupHelper.cs -
 //
 // Copyright 2014 Carbonfrost Systems, Inc. (http://carbonfrost.com)
 //
@@ -17,26 +17,24 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Carbonfrost.Commons.Shared;
 using Carbonfrost.Commons.PropertyTrees.Schema;
 
 namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
-    partial class PropertyTreeBinderImpl {
+    interface IPropertyNameLookupHelper {
 
-        class ApplyDefaultConstructorStep : PropertyTreeBinderStep {
+        OperatorDefinition FindOperator(PropertyTreeDefinition definition,
+                                        Type componentType,
+                                        QualifiedName qn);
 
-            public override PropertyTreeMetaObject EndStep(PropertyTreeMetaObject target) {
-                if (target.ShouldConstruct) {
-                    var ctor = target.GetDefinition().Constructor;
-
-                    if (ctor != null)
-                        return target.BindConstructor(ctor, Empty<string, PropertyTreeMetaObject>.ReadOnlyDictionary);
-                }
-                return target;
-            }
-
-        }
+        PropertyDefinition FindProperty(PropertyTreeDefinition definition,
+                                        Type componentType,
+                                        QualifiedName qn,
+                                        IEnumerable<PropertyTreeDefinition> ancestors);
     }
-
 }
+
+

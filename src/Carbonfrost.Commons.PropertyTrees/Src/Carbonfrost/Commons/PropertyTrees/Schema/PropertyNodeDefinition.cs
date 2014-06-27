@@ -31,17 +31,10 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return QualifiedName.Create(this.Namespace, this.Name);
             }
-            set {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-
-                this.Name = value.LocalName;
-                this.Namespace = value.Namespace.ToString();
-            }
         }
 
-        public abstract string Name { get; set; }
-        public abstract string Namespace { get; set; }
+        public abstract string Name { get; }
+        public abstract string Namespace { get; }
 
         internal abstract void AcceptVisitor(PropertyTreeSchemaVisitor visitor);
         internal abstract TResult AcceptVisitor<TArgument, TResult>(PropertyTreeSchemaVisitor<TArgument, TResult> visitor, TArgument argument);

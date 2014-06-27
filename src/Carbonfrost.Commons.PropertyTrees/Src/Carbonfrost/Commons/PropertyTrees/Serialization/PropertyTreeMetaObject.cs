@@ -35,6 +35,9 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
         public static readonly PropertyTreeMetaObject Null
             = new NullMetaObject();
 
+        private readonly IPropertyNameLookupHelper propertyLookup
+            = new PropertyNameLookupHelper();
+
         private IEnumerable<PropertyTreeMetaObject> Ancestors {
             get {
                 return this.GetAncestors().Cast<PropertyTreeMetaObject>();
@@ -47,6 +50,27 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
         public abstract object Component {
             get;
+        }
+
+        public PropertyTreeMetaObject Root {
+            get {
+                if (Parent == null)
+                    return this;
+
+                return Parent.Root;
+            }
+        }
+
+        internal virtual bool ShouldBindChildren {
+            get {
+                return Component != null;
+            }
+        }
+
+        internal virtual bool ShouldConstruct {
+            get {
+                return Component == null;
+            }
         }
 
         public PropertyTreeMetaObject Parent {
@@ -85,6 +109,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
         }
 
         public virtual void BindSetMember(PropertyDefinition property, QualifiedName name, PropertyTreeMetaObject value, PropertyTreeMetaObject ancestor, IServiceProvider serviceProvider) {
+        }
+
+        // TODO This may become API soon
+        internal virtual PropertyTreeMetaObject BindGenericParameters(IEnumerable<Type> types) {
+            return this;
         }
 
         internal PropertyTreeMetaObject BindTargetProvider(TargetProviderDirective binder, IServiceProvider serviceProvider) {
@@ -145,11 +174,12 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 return new TypeMetaObject();
 
             if (componentType.IsGenericType && componentType.GetGenericTypeDefinition() == typeof(ITemplate<>)) {
-                var instType = componentType.GetGenericArguments()[0];
-                if (instType.GetActivationConstructor() == null) {
-                    throw PropertyTreesFailure.TemplateTypeConstructorMustBeNiladic("componentType", componentType);
-                }
-                return new TemplateMetaObject(componentType);
+                return TemplateMetaObject.FromTemplateType(componentType);
+            }
+
+            if (componentType == typeof(ITemplate)) {
+                return new UntypedToTypedMetaObject(typeof(ITemplate),
+                                                    t => TemplateMetaObject.FromInstanceType(null, t.Single()));
             }
 
             return new PreactivationMetaObject(componentType);
@@ -178,6 +208,22 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 throw new ArgumentNullException("component");
 
             return CreateChild(component, component.GetType());
+        }
+
+        public virtual PropertyTreeMetaObject CreateChild(PropertyDefinition property,
+                                                          QualifiedName name,
+                                                          PropertyTreeMetaObject ancestor)
+        {
+            var value = property.GetValue(this.Component, ancestor, name);
+            var propertyType = property.PropertyType;
+
+            // Refine property type if possible
+            if (value == null) {
+                return CreateChild(propertyType);
+            }
+            else {
+                return CreateChild(value, propertyType);
+            }
         }
 
         internal bool TryConvertFromText(string text,
@@ -228,8 +274,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
         internal PropertyDefinition SelectProperty(QualifiedName qn) {
             var result = SelectPropertyCore(qn);
 
-            if (result == null) {
-                this.ProbeRuntimeComponents();
+            if (result == null && ProbeRuntimeComponents()) {
                 result = SelectPropertyCore(qn);
             }
 
@@ -237,77 +282,43 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
         }
 
         private PropertyDefinition SelectPropertyCore(QualifiedName qn) {
-            var definition = GetDefinition();
-            var result = definition.GetProperty(qn);
-            if (result != null)
-                return result;
-
-            int dot = qn.LocalName.IndexOf('.');
-            if (dot > 0) {
-                // TODO Index whether the PTD has extenders so we can skip some ancestors (perf)
-                string prefix = qn.LocalName.Substring(0, dot);
-
-                foreach (var current in Ancestors) {
-                    var currentDef = current.GetDefinition();
-                    if (currentDef.Name == prefix) {
-                        // TODO Local name could be different
-                        var prop = currentDef.GetProperty(qn);
-                        if (prop != null) {
-                            return prop;
-                        }
-                    }
-                }
-
-            } else {
-
-                foreach (var current in Ancestors) {
-                    var curDefinition = current.GetDefinition();
-                    var prop = curDefinition.GetProperty(qn);
-                    if (IsValidExtender(prop))
-                        return prop;
-
-                    var qn2 = qn.ChangeLocalName(current.ComponentType.Name + "." + qn.LocalName);
-                    prop = curDefinition.GetProperty(qn2);
-                    if (IsValidExtender(prop))
-                        return prop;
-
-                }
-            }
-
-            return null;
-        }
-
-        private bool IsValidExtender(PropertyDefinition prop) {
-            return prop != null && prop.IsExtender && prop.CanExtend(this.ComponentType);
+            return propertyLookup.FindProperty(GetDefinition(),
+                                               this.ComponentType,
+                                               qn,
+                                               Ancestors.Select(t => t.GetDefinition())
+                                              );
         }
 
         // TODO According to spec, dependencies should be enumerated first, which should mean we don't probe after they have been
-        internal void ProbeRuntimeComponents() {
+        internal bool ProbeRuntimeComponents() {
             var rc = this.Component as IRuntimeComponent;
 
             if (rc == null) {
                 if (this.Parent != null)
-                    this.Parent.ProbeRuntimeComponents();
+                    return this.Parent.ProbeRuntimeComponents();
 
             } else {
+                bool any = false;
                 foreach (var comp in rc.Dependencies) {
-                    if (comp.IsAssembly)
+                    if (comp.IsAssembly) {
                         Assembly.Load(comp.Name.ToAssemblyName());
+                        any = true;
+                    }
                 }
+
+                return any;
             }
+
+            return  false;
         }
 
         internal virtual OperatorDefinition SelectOperator(QualifiedName qn) {
-            OperatorDefinition factory = null;
             var treeDef = PropertyTreeDefinition.FromType(this.ComponentType);
-            if (treeDef != null) {
-                factory = treeDef.GetOperator(qn);
+            var factory = propertyLookup.FindOperator(treeDef, this.ComponentType, qn);
 
-                if (factory == null) {
-                    this.ProbeRuntimeComponents();
+            if (factory == null && ProbeRuntimeComponents()) {
 
-                    factory = treeDef.GetOperator(qn);
-                }
+                factory = propertyLookup.FindOperator(treeDef, this.ComponentType, qn);
             }
             return factory;
         }

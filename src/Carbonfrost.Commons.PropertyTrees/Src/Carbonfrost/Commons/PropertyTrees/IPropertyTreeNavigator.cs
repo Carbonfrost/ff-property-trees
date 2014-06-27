@@ -31,6 +31,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
         string Name { get; }
         string Namespace { get; }
         QualifiedName QualifiedName { get; }
+        bool IsExpressNamespace { get; }
 
         object Value { get; }
         PropertyNodeType NodeType { get; }

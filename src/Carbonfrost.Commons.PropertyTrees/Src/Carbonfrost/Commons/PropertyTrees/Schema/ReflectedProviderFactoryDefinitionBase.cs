@@ -54,11 +54,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public override string Namespace {
             get { return qname.NamespaceName; }
-            set { throw Failure.ReadOnlyProperty(); } }
+        }
 
         public override string Name {
             get { return qname.LocalName; }
-            set { throw Failure.ReadOnlyProperty(); } }
+        }
 
         public override PropertyDefinition DefaultParameter {
             get {

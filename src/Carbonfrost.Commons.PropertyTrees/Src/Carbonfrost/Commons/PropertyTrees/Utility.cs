@@ -199,5 +199,17 @@ namespace Carbonfrost.Commons.PropertyTrees {
         public static string GetExtenderName(AttachedPropertyID name) {
             return string.Concat(name.DeclaringType.Name, ".", name.PropertyName);
         }
+
+        public static NamespaceUri GetXmlnsNamespaceSafe(Type type) {
+            if (type == null) {
+                return null;
+            }
+            if (type.IsGenericType && !type.IsGenericTypeDefinition) {
+                return null;
+            }
+
+            var nn = type.GetQualifiedName();
+            return nn.Namespace;
+        }
     }
 }

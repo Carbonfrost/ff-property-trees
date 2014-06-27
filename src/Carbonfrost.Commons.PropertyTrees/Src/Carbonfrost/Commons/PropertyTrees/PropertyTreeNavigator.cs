@@ -52,6 +52,16 @@ namespace Carbonfrost.Commons.PropertyTrees {
             get { return this.NodeType == PropertyNodeType.PropertyTree; }
         }
 
+        bool IPropertyTreeNavigator.IsExpressNamespace {
+            get { return IsExpressNamespace; }
+        }
+
+        internal virtual bool IsExpressNamespace {
+            get {
+                return false;
+            }
+        }
+
         protected PropertyTreeNavigator() {}
 
         public virtual PropertyTreeWriter AppendChild() {

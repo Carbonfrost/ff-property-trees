@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Carbonfrost.Commons.ComponentModel;
 using Carbonfrost.Commons.ComponentModel.Annotations;
 using Carbonfrost.Commons.Shared;
@@ -36,6 +37,13 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
         public abstract PropertyDefinition DefaultProperty { get; }
         public abstract Type SourceClrType { get; }
         public abstract PropertyTreeSchema Schema { get; }
+
+        public IEnumerable<PropertyTreeDefinition> BaseTypes {
+            get {
+                return Utility.EnumerateInheritedTypes(this.SourceClrType)
+                    .Select(t => FromType(t));
+            }
+        }
 
         public static PropertyTreeDefinition FromType(Type type) {
             if (type == null)

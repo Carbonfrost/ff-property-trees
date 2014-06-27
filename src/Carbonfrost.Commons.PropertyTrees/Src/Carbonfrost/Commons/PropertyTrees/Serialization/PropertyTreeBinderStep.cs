@@ -71,16 +71,19 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 var duplicates = new HashSet<QualifiedName>();
                 var mapped = new Dictionary<QualifiedName, PropertyTreeNavigator>();
                 foreach (var child in children) {
-                    if (duplicates.Contains(child.QualifiedName)) {
+                    // Implicitly map default NS to real
+                    var impliedName = ImpliedName(child, target);
+
+                    if (duplicates.Contains(impliedName)) {
                         // Duplicates can't bind to parameters (only to param arrays)
 
-                    } else if (mapped.ContainsKey(child.QualifiedName)) {
+                    } else if (mapped.ContainsKey(impliedName)) {
                         // Detected a duplicate
-                        duplicates.Add(child.QualifiedName);
-                        mapped.Remove(child.QualifiedName);
+                        duplicates.Add(impliedName);
+                        mapped.Remove(impliedName);
 
                     } else {
-                        mapped.Add(child.QualifiedName, child);
+						mapped.Add(impliedName, child);
                     }
                 }
 
@@ -93,7 +96,12 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 foreach (PropertyDefinition p in op.Parameters) {
                     // Fallback to empty ns
                     PropertyTreeNavigator nav;
-                    if (mapped.TryGetValue(p.QualifiedName, out nav)) {
+                    QualifiedName impliedName = p.QualifiedName;
+                    if (p.QualifiedName.Namespace.IsDefault) {
+                        impliedName = impliedName.ChangeNamespace(op.Namespace);
+                    }
+
+                    if (mapped.TryGetValue(impliedName, out nav)) {
                         // Binds a parameter required for activating an instance
                         // TODO Should we supply/use attributes from the parameter
                         // and/or corresponding property descriptor?

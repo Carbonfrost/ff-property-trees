@@ -33,6 +33,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
         private readonly IPropertyTreeBinderErrors errors;
         private readonly PropertyTreeBinderStep[] Pipeline = {
+            new ApplyGenericParametersStep(),
             new ApplyLateBoundTypeStep(),
             new ApplyProviderTypeStep(),
             new ApplyConstructorStep(),
@@ -58,6 +59,18 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             get {
                 return callback;
             }
+        }
+
+        private static QualifiedName ImpliedName(PropertyTreeNavigator nav, PropertyTreeMetaObject target) {
+            QualifiedName qualifiedName = nav.QualifiedName;
+            if (nav.IsExpressNamespace)
+                return qualifiedName;
+
+            NamespaceUri impliedNS = Utility.GetXmlnsNamespaceSafe(target.ComponentType);
+            if (impliedNS == null)
+                return qualifiedName;
+            else
+                return qualifiedName.ChangeNamespace(impliedNS);
         }
 
         internal IServiceProvider GetBasicServices(PropertyTreeNavigator nav) {
@@ -135,7 +148,8 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
                     var descriptor = serviceProvider.GetService<ITypeDescriptorContext>();
                     string property = descriptor.PropertyDescriptor.Name;
-                    var componentType = descriptor.Instance.GetType();
+                    var instance = descriptor.Instance;
+                    var componentType = instance == null ? descriptor.PropertyDescriptor.ComponentType : instance.GetType();
                     FileLocation loc = navigator.FileLocation;
 
                     try {

@@ -137,6 +137,12 @@ namespace Carbonfrost.Commons.PropertyTrees {
         public override string Name {
             get { return this.current.Name; } }
 
+        internal override bool IsExpressNamespace {
+            get {
+                return this.current.IsExpressNamespace;
+            }
+        }
+
         public override PropertyTreeWriter AppendChild() {
             if (this.current.IsPropertyTree) {
                 var tree = (PropertyTree) this.current;

@@ -25,10 +25,9 @@ using Carbonfrost.Commons.PropertyTrees.Serialization;
 
 namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
-    class TemplateMetaObject : PropertyTreeMetaObject {
+    partial class TemplateMetaObject : PropertyTreeMetaObject {
 
-        private readonly List<ITemplateCommand> items
-            = new List<ITemplateCommand>();
+        private readonly List<ITemplateCommand> _items = new List<ITemplateCommand>();
 
         private object component;
         private readonly Type componentType;
@@ -46,8 +45,48 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             }
         }
 
-        public TemplateMetaObject(Type componentType) {
-            this.componentType = componentType.GetGenericArguments()[0];
+        internal override bool ShouldConstruct {
+            get {
+                return false;
+            }
+        }
+
+        internal override bool ShouldBindChildren {
+            get {
+                return true;
+            }
+        }
+
+        private TemplateMetaObject(TemplateMetaObject parent, Type componentType) : base(parent) {
+            if (componentType.IsGenericType && componentType.GetGenericTypeDefinition() == typeof(ITemplate<>))
+                throw new ArgumentException();
+
+            this.componentType = componentType;
+        }
+
+        private void AppendCommand(ITemplateCommand cmd) {
+            if (this.Parent == null)
+                _items.Add(cmd);
+            else
+                ((TemplateMetaObject) this.Parent).AppendCommand(cmd);
+        }
+
+        public static TemplateMetaObject FromTemplateType(Type componentType) {
+            // Assume ITemplate<T> is the input
+            var instType = componentType.GetGenericArguments()[0];
+            if (instType.GetActivationConstructor() == null) {
+                throw PropertyTreesFailure.TemplateTypeConstructorMustBeNiladic("componentType", componentType);
+            }
+            return new TemplateMetaObject(null, instType);
+        }
+
+        public static TemplateMetaObject FromInstanceType(TemplateMetaObject parent, Type componentType) {
+
+            return new TemplateMetaObject(parent, componentType);
+        }
+
+        private TemplateMetaObject FromInstanceType(Type componentType) {
+            return new TemplateMetaObject(this, componentType);
         }
 
         public override PropertyTreeMetaObject BindConstructor(OperatorDefinition definition,
@@ -59,52 +98,52 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             return this;
         }
 
+        public override PropertyTreeMetaObject BindInitializeValue(string text, IServiceProvider serviceProvider) {
+            object value;
+            TryConvertFromText(text, serviceProvider, out value);
+            return PropertyTreeMetaObject.Create(value);
+        }
+
         public override void BindSetMember(PropertyDefinition property, QualifiedName name, PropertyTreeMetaObject value, PropertyTreeMetaObject ancestor, IServiceProvider serviceProvider) {
-            items.Add(new SetPropertyCommand(property, name, value.Component));
+            if (property.IsReadOnly && value is TemplateMetaObject) {
+                return;
+            }
+
+            AppendCommand(new SetPropertyCommand(property, name, value.Component));
+        }
+
+        public override PropertyTreeMetaObject BindAddChild(OperatorDefinition definition, IReadOnlyDictionary<string, PropertyTreeMetaObject> arguments) {
+            AppendCommand(new AddChildCommand(definition, arguments));
+            return FromInstanceType(definition.ReturnType);
         }
 
         public override PropertyTreeMetaObject BindEndObject(IServiceProvider serviceProvider) {
-            var instType = this.ComponentType;
-            var templateType = typeof(PropertyTreeTemplate<>).MakeGenericType(instType);
-            this.component = Activator.CreateInstance(templateType, new object[] { this.items.ToArray() });
+            if (this.Parent == null) {
+                var instType = this.ComponentType;
+                var templateType = typeof(PropertyTreeTemplate<>).MakeGenericType(instType);
+
+                this.component = Activator.CreateInstance(templateType, new object[] { _items.ToArray() });
+            } else {
+                AppendCommand(PopCommand.Instance);
+            }
+
             return this;
         }
 
-        interface ITemplateCommand
-        {
-            void Apply(object component);
+        public override PropertyTreeMetaObject CreateChild(object component, Type componentType) {
+            throw new NotImplementedException();
         }
 
-        sealed class PropertyTreeTemplate<T> : ITemplate<T> {
+        public override PropertyTreeMetaObject CreateChild(PropertyDefinition property,
+                                                           QualifiedName name,
+                                                           PropertyTreeMetaObject ancestor) {
 
-            readonly IList<ITemplateCommand> items;
-
-            public PropertyTreeTemplate(ITemplateCommand[] items) {
-                this.items = items;
+            if (property.IsReadOnly) {
+                AppendCommand(new PushPropertyCommand(property, name));
+                return FromInstanceType(property.PropertyType);
             }
 
-            public void Initialize(T value) {
-                foreach (var m in items)
-                    m.Apply(value);
-            }
+            return CreateChild(property.PropertyType);
         }
-
-        class SetPropertyCommand : ITemplateCommand {
-
-            readonly PropertyDefinition property;
-            readonly QualifiedName name;
-            readonly object value;
-
-            public SetPropertyCommand(PropertyDefinition property, QualifiedName name, object value) {
-                this.property = property;
-                this.name = name;
-                this.value = value;
-            }
-
-            void ITemplateCommand.Apply(object component) {
-                property.SetValue(component, name, value);
-            }
-        }
-
     }
 }

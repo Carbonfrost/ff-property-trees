@@ -1,5 +1,5 @@
 //
-// - ApplyDefaultConstructorStep.cs -
+// - PopCommand.cs -
 //
 // Copyright 2014 Carbonfrost Systems, Inc. (http://carbonfrost.com)
 //
@@ -17,25 +17,23 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Carbonfrost.Commons.PropertyTrees.Schema;
+using Carbonfrost.Commons.PropertyTrees.Serialization;
 
 namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
-    partial class PropertyTreeBinderImpl {
+    partial class TemplateMetaObject {
 
-        class ApplyDefaultConstructorStep : PropertyTreeBinderStep {
+        sealed class PopCommand : ITemplateCommand {
 
-            public override PropertyTreeMetaObject EndStep(PropertyTreeMetaObject target) {
-                if (target.ShouldConstruct) {
-                    var ctor = target.GetDefinition().Constructor;
+            public static readonly ITemplateCommand Instance = new PopCommand();
 
-                    if (ctor != null)
-                        return target.BindConstructor(ctor, Empty<string, PropertyTreeMetaObject>.ReadOnlyDictionary);
-                }
-                return target;
+            private PopCommand() {}
+
+            void ITemplateCommand.Apply(Stack<object> values) {
+                values.Pop();
             }
-
         }
     }
 

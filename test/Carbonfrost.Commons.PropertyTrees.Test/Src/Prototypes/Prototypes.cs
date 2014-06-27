@@ -30,9 +30,12 @@ using Carbonfrost.Commons.Shared.Runtime;
 using Carbonfrost.Commons.Shared.Runtime.Components;
 using Carbonfrost.Commons.Shared.Runtime.Conditions;
 
+using ComponentCollection = Carbonfrost.Commons.Shared.Runtime.Components.ComponentCollection;
+
 #pragma warning disable 3003
 #pragma warning disable 3008
 
+[assembly: Xmlns("https://ns.example.com", ClrNamespace = "Prototypes")]
 namespace Prototypes {
 
     public class Alpha {
@@ -192,6 +195,8 @@ namespace Prototypes {
 
         // TODO Should ALpha be implicitly created like in XRMS?
         private readonly IDictionary<string, Alpha> g = new Dictionary<string, Alpha>();
+        private readonly Alpha h = new Alpha();
+        private readonly Eta i = new Eta(0, TimeSpan.Zero, 0, 0);
 
         public Alpha A { get; set; }
         public Gamma B { get; set; }
@@ -201,6 +206,8 @@ namespace Prototypes {
         public Gamma E { get; set; }
         public Properties F { get; set; }
         public IDictionary<string, Alpha> G { get { return g; } }
+        public Alpha H { get { return h; } }
+        public Eta I { get { return i; } }
 
         // Should be treated as a property and not a streaming source
         public string Source { get; set; }
@@ -249,6 +256,7 @@ namespace Prototypes {
         public TimeSpan B { get; private set; }
         public double C { get; private set; }
         public long D { get; private set; }
+        public Uri E { get; set; }
 
         public Eta(int a, TimeSpan b, double c, long d) {
             this.A = a;
@@ -261,6 +269,7 @@ namespace Prototypes {
     public class IotaChi {
 
         public StreamingSource A { get; set; }
+        public ITemplate Template { get; set; }
     }
 
     public class Iota {
@@ -538,5 +547,16 @@ namespace Prototypes {
     // TODO Demonstrates the use of service activation using tau
     public class Tau {
 
+    }
+
+    public class Bravo {
+
+        readonly ComponentCollection components = new ComponentCollection();
+
+        public ComponentCollection Components {
+            get {
+                return components;
+            }
+        }
     }
 }

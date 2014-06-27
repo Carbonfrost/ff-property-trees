@@ -68,17 +68,11 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             get {
                 return this.ns;
             }
-            set {
-                throw Failure.ReadOnlyProperty();
-            }
         }
 
         public override string Name {
             get {
                 return parameter.Name;
-            }
-            set {
-                throw Failure.ReadOnlyProperty();
             }
         }
 

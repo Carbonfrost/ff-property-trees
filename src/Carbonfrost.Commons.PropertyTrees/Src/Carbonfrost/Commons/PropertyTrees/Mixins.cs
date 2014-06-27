@@ -35,6 +35,21 @@ namespace Carbonfrost.Commons.PropertyTrees {
             while (disp.MoveNext()) {}
         }
 
+        public static T SingleOrThrow<T>(this IEnumerable<T> items, Func<Exception> error) {
+            bool flag = false;
+
+            T result = default(T);
+            foreach (var e in items) {
+                if (flag)
+                    throw error();
+
+                flag = true;
+                result = e;
+            }
+
+            return result;
+        }
+
         public static bool IsHiddenUX(this Type type) {
             // Prevent confusion in the error message by concealing internal type
             // names from error messages

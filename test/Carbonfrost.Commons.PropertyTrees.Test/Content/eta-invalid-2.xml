@@ -1,7 +1,8 @@
-﻿<?xml version="1.0"?>
-<!-- Constructor arguments are in the wrong namespace-->
+<?xml version="1.0"?>
+<!-- Constructor arguments are in the wrong namespace.
+     Quirks don't operate on other:d because it has a prefix. -->
 <eta
-    xmlns:other = "http://ns.example.com"
+    xmlns:other = "http://ns.example.org/"
     a        = "256"
     b        = "2.5:05:05.200"
     c        = "2256.231250002"
