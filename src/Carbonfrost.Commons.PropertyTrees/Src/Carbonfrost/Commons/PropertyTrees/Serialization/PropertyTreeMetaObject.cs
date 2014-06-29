@@ -35,7 +35,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
         public static readonly PropertyTreeMetaObject Null
             = new NullMetaObject();
 
-        private readonly IPropertyNameLookupHelper propertyLookup
+        private static readonly IPropertyNameLookupHelper propertyLookup
             = new PropertyNameLookupHelper();
 
         private IEnumerable<PropertyTreeMetaObject> Ancestors {

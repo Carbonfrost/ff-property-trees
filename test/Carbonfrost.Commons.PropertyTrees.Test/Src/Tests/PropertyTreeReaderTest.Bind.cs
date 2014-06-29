@@ -474,6 +474,19 @@ namespace Tests {
         }
 
         [Test]
+        public void bind_should_invoke_generic_ancestor_attached_property_context() {
+            PropertyTreeReader pt = LoadContent("control-extension-property-3.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var c = pt.Bind<Canvas>();
+
+            Assert.That(c.Controls.Count, Is.EqualTo(2));
+            Assert.That(c.Controls[0].Controls.Count, Is.EqualTo(1));
+            Assert.That(c.Controls[0].Controls[0]._Left, Is.EqualTo(132));
+            Assert.That(c.Controls[1]._Left, Is.EqualTo(62));
+        }
+
+        [Test]
         public void bind_should_invoke_extension_method() {
             PropertyTreeReader pt = LoadContent("control-extension-property-2.xml");
             Assume.That(pt.Read(), Is.True);
@@ -504,6 +517,42 @@ namespace Tests {
 
             Assert.That(p.Components[0].Type, Is.EqualTo("assembly"));
             Assert.That(p.Components[0].Name.Name, Is.EqualTo("Carbonfrost.Commons.SharedRuntime"));
+        }
+
+        [Test]
+        public void bind_should_bind_nullable_reference_types() {
+            // Reference types in ctor don't have to be specified
+
+            PropertyTreeReader pt = LoadContent("iota-2.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            Iota i = pt.Bind<Iota>();
+
+            Assert.That(i.A, Is.EqualTo(8256));
+            Assert.That(i.B, Is.EqualTo(TimeSpan.Parse("82.5:05:05.200")));
+            Assert.That(i.C, Is.EqualTo(82256.231250002));
+            Assert.That(i.D, Is.EqualTo(8293680235));
+        }
+
+        [Test]
+        public void bind_should_bind_nested_class() {
+            PropertyTreeReader pt = LoadContent("iota-2.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            Iota i = pt.Bind<Iota>();
+
+            Assert.That(i.H.A, Is.EqualTo("ng"));
+        }
+
+        [Test]
+        public void bind_should_be_invalid_on_value_type() {
+            // Values types in ctor must be specified
+
+            PropertyTreeReader pt = LoadContent("iota-invalid-1.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            Assert.That(() => pt.Bind<Iota>(), Throws.InstanceOf<PropertyTreeException>()
+                        .And.Message.StringMatching("line 3, pos 2"));
         }
     }
 

@@ -30,6 +30,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
     static class TypeHelper {
 
+        public static bool IsParameterRequired(Type type) {
+            return type.IsValueType && Nullable.GetUnderlyingType(type) == null;
+        }
+
         public static MethodBase FindActivationConstructor(Type declaringType) {
             MethodBase ctor = declaringType.GetActivationConstructor();
             if (ctor == null)
@@ -121,6 +125,9 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 else
                     return string.Empty;
             }
+
+            if (type.IsGenericParameter)
+                return string.Empty;
 
             if (type.IsArray || type.IsByRef || type.IsPointer)
                 return GetNamespaceName(type.GetElementType());

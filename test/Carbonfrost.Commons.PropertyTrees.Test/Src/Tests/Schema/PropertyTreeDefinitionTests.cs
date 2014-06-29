@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Carbonfrost.Commons.ComponentModel;
 using Carbonfrost.Commons.PropertyTrees;
@@ -30,6 +31,22 @@ namespace Tests.Schema {
 
     [TestFixture]
     public class PropertyTreeDefinitionTests : TestBase {
+
+        [Test]
+        public void simple_properties_should_equal_expected_values_in_simple_types() {
+            var a = PropertyTreeDefinition.FromType(typeof(Alpha));
+            Assert.That(a.Name, Is.EqualTo("Alpha"));
+            Assert.That(a.Namespace, Is.EqualTo("https://ns.example.com/"));
+            Assert.That(a.SourceClrType, Is.EqualTo(typeof(Alpha)));
+        }
+
+        [Test]
+        public void Name_should_equal_mangle_in_constructed_generic_type() {
+            var a = PropertyTreeDefinition.FromType(typeof(List<Alpha>));
+            Assert.That(a.Name, Is.EqualTo("List-1"));
+            Assert.That(a.Namespace, Is.EqualTo(""));
+            Assert.That(a.SourceClrType, Is.EqualTo(typeof(List<Alpha>)));
+        }
 
         [Test]
         public void get_property_nominal() {
@@ -94,6 +111,16 @@ namespace Tests.Schema {
             var fac = def.GetOperator("p");
 
             Assert.That(fac, Is.Not.Null);
+        }
+
+        [Test]
+        public void add_child_operators_inherited_constructed_generics() {
+            var def = PropertyTreeDefinition.FromType(typeof(Collection<Control>));
+            var fac = def.GetOperator("add");
+
+            Assert.That(fac, Is.Not.Null);
+            Assert.That(fac.Namespace, Is.EqualTo(""));
+            Assert.That(fac.Name, Is.EqualTo("Add"));
         }
 
         [Test]

@@ -17,6 +17,7 @@
 //
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Carbonfrost.Commons.PropertyTrees;
 using Carbonfrost.Commons.PropertyTrees.Schema;
@@ -24,6 +25,7 @@ using Carbonfrost.Commons.PropertyTrees.Serialization;
 using Carbonfrost.Commons.Shared;
 using Carbonfrost.Commons.Shared.Runtime.Components;
 using NUnit.Framework;
+using Prototypes;
 
 namespace Tests.Serialization {
 
@@ -39,6 +41,20 @@ namespace Tests.Serialization {
             var qn = QualifiedName.Create(comp.Namespace, "add");
             var result = unit.FindOperator(comp, typeof(ComponentCollection), qn);
             Assert.That(result, Is.Not.Null);
+        }
+
+        [Test]
+        public void FindOperator_should_implicitly_handle_inherited_operator_names_constructed_generics() {
+            var unit = new PropertyNameLookupHelper();
+            var comp = PropertyTreeDefinition.FromType(typeof(Collection<Control>));
+
+            // Though add is defined inside default NS, it is accessible via the NS of the type
+            var qn = QualifiedName.Create("https://ns.example.com/", "add");
+            var result = unit.FindOperator(comp, typeof(Collection<Control>), qn);
+
+            var ops = comp.EnumerateOperators();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.SameAs(comp.GetOperator("add")));
         }
     }
 }

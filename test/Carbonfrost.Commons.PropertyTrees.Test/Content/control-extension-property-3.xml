@@ -1,0 +1,11 @@
+<canvas xmlns="https://ns.example.com/">
+    <p>
+        <!-- The use of left is relative to the canvas -->
+        <textbox left="132" />
+    </p>
+    <controls>
+        <!-- Contained within controls which is IList<>, but
+             should bind to canvas -->
+        <add provider="textbox" left="62" />
+    </controls>
+</canvas>

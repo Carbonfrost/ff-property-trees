@@ -27,25 +27,20 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
     partial class PropertyTreeBinderImpl {
 
-        class ProcessOperatorsStep : PropertyTreeBinderStep {
+        class ProcessOperatorsStep : IApplyMemberStep {
 
-            public override PropertyTreeMetaObject StartStep(PropertyTreeMetaObject target, PropertyTreeNavigator self, NodeList children) {
-                children.FindAndRemove(t => Apply(target, t)).All();
-                return target;
-            }
-
-            private bool Apply(PropertyTreeMetaObject target, PropertyTreeNavigator node) {
+            bool IApplyMemberStep.Apply(PropertyTreeBinderImpl parent, PropertyTreeMetaObject target, PropertyTreeNavigator node) {
                 var member = target.SelectOperator(ImpliedName(node, target));
 
                 if (member != null) {
-                    DoOperatorBind(target, node, member);
+                    DoOperatorBind(parent, target, node, member);
                     return true;
                 }
 
                 return false;
             }
 
-            private PropertyTreeMetaObject DoOperatorBind(PropertyTreeMetaObject target, PropertyTreeNavigator navigator, OperatorDefinition op) {
+            private PropertyTreeMetaObject DoOperatorBind(PropertyTreeBinderImpl parent, PropertyTreeMetaObject target, PropertyTreeNavigator navigator, OperatorDefinition op) {
                 OperatorDefinition addon = op;
 
                 if (addon.DefaultParameter != null) {
@@ -66,7 +61,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                         if (ex.IsCriticalException())
                             throw;
 
-                        Parent.errors.BadAddChild(target.ComponentType, ex, navigator.FileLocation);
+                        parent.errors.BadAddChild(target.ComponentType, ex, navigator.FileLocation);
                     }
 
                 } else {
@@ -82,7 +77,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                                 var child = target.BindAddChild(addon, args);
 
                                 if (child.ShouldBindChildren) {
-                                    Parent.BindChildNodes(child, navigator, children);
+                                    parent.BindChildNodes(child, navigator, children);
                                 }
                             };
                             break;
@@ -97,8 +92,8 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                             break;
                     }
 
-                    var services = Parent.GetBasicServices(navigator);
-                    var args2 = ExtractParameterDictionary(op, target, services, children);
+                    var services = parent.GetBasicServices(navigator);
+                    var args2 = parent.ExtractParameterDictionary(op, target, services, children);
                     func(args2);
                 }
 

@@ -53,6 +53,13 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
             return map.GetValueOrCache(type, t => new ReflectedPropertyTreeDefinition(t));
         }
 
+        private static PropertyTreeDefinition SafeFromType(Type type) {
+            if (type == null || type.IsGenericParameter)
+                return null;
+
+            return FromType(type);
+        }
+
         public static PropertyTreeDefinition FromValue(object component) {
             if (component == null)
                 throw new ArgumentNullException("component");
@@ -93,5 +100,20 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
         public abstract PropertyDefinition GetProperty(QualifiedName name, GetPropertyOptions options = GetPropertyOptions.None);
         public abstract PropertyDefinition GetProperty(string name, GetPropertyOptions options = GetPropertyOptions.None);
 
+        internal virtual IEnumerable<string> GetSerializationCandidateNamespaces() {
+            var type = SourceClrType;
+            var result = BaseTypes.Select(t => t.Namespace);
+
+            if (type.IsGenericType && !type.IsGenericTypeDefinition) {
+                result = result.Concat(
+                    type.GetGenericArguments()
+                    .Select(t => {
+                                var pd = PropertyTreeDefinition.SafeFromType(t);
+                                return pd == null ? null : pd.Namespace;
+                            }));
+                }
+
+            return result.Where(t => t != null);
+        }
     }
 }

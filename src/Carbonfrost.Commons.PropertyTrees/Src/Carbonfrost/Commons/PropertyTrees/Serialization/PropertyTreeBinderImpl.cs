@@ -39,9 +39,12 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             new ApplyConstructorStep(),
             new ApplyStreamingSourcesStep(),
             new ApplyDefaultConstructorStep(),
-            new ProcessPropertiesStep(false),
-            new ProcessOperatorsStep(),
-            new ProcessPropertiesStep(true),
+            new ProcessMembersStep
+                (
+                    new ProcessPropertiesStep(false),
+                    new ProcessOperatorsStep(),
+                    new ProcessPropertiesStep(true)
+                ),
             new ErrorUnmatchedMembersStep(),
             new EndObjectStep(),
         };
@@ -98,8 +101,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             var existing = target.SelectMember(defaultNS);
 
             if (existing == null) {
-                return t => t.Name == name
-                    && (string.IsNullOrEmpty(t.Namespace) || t.Namespace == Xmlns.PropertyTrees2010);
+                return t => t.Name == name;
 
             } else {
                 return t => t.QualifiedName == langNS;
@@ -147,9 +149,16 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                         throw;
 
                     var descriptor = serviceProvider.GetService<ITypeDescriptorContext>();
-                    string property = descriptor.PropertyDescriptor.Name;
-                    var instance = descriptor.Instance;
-                    var componentType = instance == null ? descriptor.PropertyDescriptor.ComponentType : instance.GetType();
+                    string property;
+                    Type componentType;
+                    if (descriptor == null || descriptor.PropertyDescriptor == null) {
+                        property = navigator.QualifiedName.ToString();
+                        componentType = descriptor.Instance.GetType();
+                    } else {
+                        property = descriptor.PropertyDescriptor.Name;
+                        componentType = descriptor.PropertyDescriptor.ComponentType;
+                    }
+
                     FileLocation loc = navigator.FileLocation;
 
                     try {

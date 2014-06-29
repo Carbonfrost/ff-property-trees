@@ -28,7 +28,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
     partial class PropertyTreeBinderImpl {
 
-        class ProcessPropertiesStep : PropertyTreeBinderStep {
+        class ProcessPropertiesStep : IApplyMemberStep {
 
             readonly bool _allowDefault;
 
@@ -36,13 +36,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 this._allowDefault = allowDefault;
             }
 
-            public override PropertyTreeMetaObject StartStep(PropertyTreeMetaObject target, PropertyTreeNavigator self, NodeList children) {
-                children.FindAndRemove(t => Apply(target, t)).All();
-                return target;
-            }
-
-            // TODO Implement property ordering based on [DependsOn]
-            private bool Apply(PropertyTreeMetaObject target, PropertyTreeNavigator node) {
+            bool IApplyMemberStep.Apply(PropertyTreeBinderImpl parent, PropertyTreeMetaObject target, PropertyTreeNavigator node) {
                 PropertyDefinition prop;
                 if (_allowDefault) {
                     prop = target.GetDefinition().DefaultProperty;
@@ -56,11 +50,12 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                         return false;
                 }
 
-                DoPropertyBind(target, node, prop);
+                DoPropertyBind(parent, target, node, prop);
                 return true;
             }
 
-            private void DoPropertyBind(PropertyTreeMetaObject target,
+            private void DoPropertyBind(PropertyTreeBinderImpl parent,
+                                        PropertyTreeMetaObject target,
                                         PropertyTreeNavigator navigator,
                                         PropertyDefinition property)
             {
@@ -85,14 +80,10 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                         LineNumber = navigator.LineNumber,
                         LinePosition = navigator.LinePosition,
                     },
-                    Parent);
+                    parent);
 
                 propertyTarget = navigator.TopLevelBind(propertyTarget, services);
                 target.BindSetMember(property, navigator.QualifiedName, propertyTarget, ancestorMeta, services);
-            }
-
-            public override PropertyTreeMetaObject EndStep(PropertyTreeMetaObject target) {
-                return target;
             }
 
             class PropertyBindContext : ITypeDescriptorContext, IXmlLineInfo {

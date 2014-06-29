@@ -130,10 +130,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             return this;
         }
 
-        public override PropertyTreeMetaObject CreateChild(object component, Type componentType) {
-            throw new NotImplementedException();
-        }
-
         public override PropertyTreeMetaObject CreateChild(PropertyDefinition property,
                                                            QualifiedName name,
                                                            PropertyTreeMetaObject ancestor) {

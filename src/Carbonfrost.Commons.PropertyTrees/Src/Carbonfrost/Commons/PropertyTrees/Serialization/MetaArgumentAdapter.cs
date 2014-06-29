@@ -52,7 +52,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 if (TryGetValue(key, out value))
                     return value;
 
-                throw new KeyNotFoundException();
+                return null;
             }
         }
 

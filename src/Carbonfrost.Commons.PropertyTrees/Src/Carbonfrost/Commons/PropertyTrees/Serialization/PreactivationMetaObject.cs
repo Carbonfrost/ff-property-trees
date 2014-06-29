@@ -64,7 +64,12 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             var op = definition;
             object component = null;
             object parent = null;
-            return PropertyTreeMetaObject.Create(op.Apply(component, parent, arguments));
+
+            var value = op.Apply(component, parent, arguments);
+            if (this.Parent == null)
+                return Create(value);
+            else
+                return this.Parent.CreateChild(value);
         }
 
         public override PropertyTreeMetaObject BindTargetProvider(QualifiedName name, object criteria, IServiceProvider serviceProvider) {
@@ -104,7 +109,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
             } else {
                 var component = ((FieldInfo) member).GetValue(null);
-                return PropertyTreeMetaObject.Create(component);
+                return this.Parent.CreateChild(component);
             }
         }
 

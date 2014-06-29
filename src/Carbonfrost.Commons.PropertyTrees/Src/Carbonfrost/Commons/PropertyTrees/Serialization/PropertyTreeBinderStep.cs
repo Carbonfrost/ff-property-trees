@@ -29,6 +29,98 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
     partial class PropertyTreeBinderImpl {
 
+        public Dictionary<string, PropertyTreeMetaObject> ExtractParameterDictionary(
+            OperatorDefinition op,
+            PropertyTreeMetaObject target,
+            IServiceProvider serviceProvider,
+            NodeList children) {
+
+            // Named constructor arguments
+            var duplicates = new HashSet<QualifiedName>();
+            var mapped = new Dictionary<QualifiedName, PropertyTreeNavigator>();
+            foreach (var child in children) {
+                // Implicitly map default NS to real
+                var impliedName = ImpliedName(child, target);
+
+                if (duplicates.Contains(impliedName)) {
+                    // Duplicates can't bind to parameters (only to param arrays)
+
+                } else if (mapped.ContainsKey(impliedName)) {
+                    // Detected a duplicate
+                    duplicates.Add(impliedName);
+                    mapped.Remove(impliedName);
+
+                } else {
+                    mapped.Add(impliedName, child);
+                }
+            }
+
+            var args = new Dictionary<string, PropertyTreeMetaObject>(op.Parameters.Count);
+
+            PropertyDefinition myParam = null;
+            List<string> requiredMissing = new List<string>();
+
+            foreach (PropertyDefinition p in op.Parameters) {
+                // Fallback to empty ns
+                PropertyTreeNavigator nav;
+                QualifiedName impliedName = p.QualifiedName;
+                if (p.QualifiedName.Namespace.IsDefault) {
+                    impliedName = impliedName.ChangeNamespace(op.Namespace);
+                }
+
+                if (mapped.TryGetValue(impliedName, out nav)) {
+                    // Binds a parameter required for activating an instance
+                    // TODO Should we supply/use attributes from the parameter
+                    // and/or corresponding property descriptor?
+
+                    var childContext = target.CreateChild(p.PropertyType);
+                    args[p.Name] = nav.TopLevelBind(childContext, serviceProvider);
+                    children.Remove(nav);
+                }
+                else if (p.IsOptional) {
+                    PropertyTreeMetaObject defaultValue;
+                    if (p.DefaultValue == null)
+                        defaultValue = PropertyTreeMetaObject.Create(p.PropertyType);
+                    else
+                        defaultValue = PropertyTreeMetaObject.Create(p.DefaultValue);
+                    args[p.Name] = defaultValue;
+
+                } else if (p.IsParamArray)
+                    myParam = p;
+
+                else if (TypeHelper.IsParameterRequired(p.PropertyType)) {
+                    requiredMissing.Add(Utility.DisplayName(p.QualifiedName));
+                }
+            }
+
+            if (requiredMissing.Count > 0)
+                errors.RequiredPropertiesMissing(requiredMissing, op, FindFileLocation(serviceProvider));
+
+            if (myParam == null && target.GetDefinition().DefaultProperty == null && duplicates.Any(t => target.SelectProperty(t) != null))
+                errors.DuplicatePropertyName(duplicates, FindFileLocation(serviceProvider));
+
+            // Try param array
+            if (myParam != null) {
+                var all = new List<object>();
+                var elementType = myParam.PropertyType.GetElementType();
+                foreach (var kvp in children) {
+
+                    // Bind child nodes so tha latebound applies
+                    var childrenList = NodeList.Create(PropertyTreeBinderImpl.SelectChildren(kvp));
+                    var inline = BindChildNodes(PropertyTreeMetaObject.Create(elementType), kvp, childrenList);
+                    var inlineVal = inline.Component;
+                    all.Add(inlineVal);
+                }
+
+                children.Clear();
+                var array = Array.CreateInstance(elementType, all.Count);
+                ((System.Collections.ICollection) all).CopyTo(array, 0);
+                args[myParam.Name] = PropertyTreeMetaObject.Create(array);
+            }
+
+            return args;
+        }
+
         abstract class PropertyTreeBinderStep {
 
             public PropertyTreeBinderImpl Parent { get; set; }
@@ -66,91 +158,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 IServiceProvider serviceProvider,
                 NodeList children)
             {
-
-                // Named constructor arguments
-                var duplicates = new HashSet<QualifiedName>();
-                var mapped = new Dictionary<QualifiedName, PropertyTreeNavigator>();
-                foreach (var child in children) {
-                    // Implicitly map default NS to real
-                    var impliedName = ImpliedName(child, target);
-
-                    if (duplicates.Contains(impliedName)) {
-                        // Duplicates can't bind to parameters (only to param arrays)
-
-                    } else if (mapped.ContainsKey(impliedName)) {
-                        // Detected a duplicate
-                        duplicates.Add(impliedName);
-                        mapped.Remove(impliedName);
-
-                    } else {
-						mapped.Add(impliedName, child);
-                    }
-                }
-
-
-                var args = new Dictionary<string, PropertyTreeMetaObject>(op.Parameters.Count);
-
-                PropertyDefinition myParam = null;
-                List<string> requiredMissing = new List<string>();
-
-                foreach (PropertyDefinition p in op.Parameters) {
-                    // Fallback to empty ns
-                    PropertyTreeNavigator nav;
-                    QualifiedName impliedName = p.QualifiedName;
-                    if (p.QualifiedName.Namespace.IsDefault) {
-                        impliedName = impliedName.ChangeNamespace(op.Namespace);
-                    }
-
-                    if (mapped.TryGetValue(impliedName, out nav)) {
-                        // Binds a parameter required for activating an instance
-                        // TODO Should we supply/use attributes from the parameter
-                        // and/or corresponding property descriptor?
-
-                        var childContext = target.CreateChild(p.PropertyType);
-                        args[p.Name] = nav.TopLevelBind(childContext, serviceProvider);
-                        children.Remove(nav);
-                    }
-                    else if (p.IsOptional) {
-                        PropertyTreeMetaObject defaultValue;
-                        if (p.DefaultValue == null)
-                            defaultValue = PropertyTreeMetaObject.Create(p.PropertyType);
-                        else
-                            defaultValue = PropertyTreeMetaObject.Create(p.DefaultValue);
-                        args[p.Name] = defaultValue;
-
-                    } else if (p.IsParamArray)
-                        myParam = p;
-
-                    else
-                        requiredMissing.Add(Utility.DisplayName(p.QualifiedName));
-                }
-
-                if (requiredMissing.Count > 0)
-                    Parent.errors.RequiredPropertiesMissing(requiredMissing, op, FindFileLocation(serviceProvider));
-
-                if (myParam == null && target.GetDefinition().DefaultProperty == null && duplicates.Any(t => target.SelectProperty(t) != null))
-                    Parent.errors.DuplicatePropertyName(duplicates, FindFileLocation(serviceProvider));
-
-                // Try param array
-                if (myParam != null) {
-                    var all = new List<object>();
-                    var elementType = myParam.PropertyType.GetElementType();
-                    foreach (var kvp in children) {
-
-                        // Bind child nodes so tha latebound applies
-                        var childrenList = NodeList.Create(PropertyTreeBinderImpl.SelectChildren(kvp));
-                        var inline = Parent.BindChildNodes(PropertyTreeMetaObject.Create(elementType), kvp, childrenList);
-                        var inlineVal = inline.Component;
-                        all.Add(inlineVal);
-                    }
-
-                    children.Clear();
-                    var array = Array.CreateInstance(elementType, all.Count);
-                    ((System.Collections.ICollection) all).CopyTo(array, 0);
-                    args[myParam.Name] = PropertyTreeMetaObject.Create(array);
-                }
-
-                return args;
+                return Parent.ExtractParameterDictionary(op, target, serviceProvider, children);
             }
         }
     }

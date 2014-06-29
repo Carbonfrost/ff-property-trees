@@ -281,6 +281,7 @@ namespace Prototypes {
         public Eta E { get; private set; }
         public string F { get; set; }
         public Uri G { get; set; }
+        public NestedClass H { get; set; }
 
         public Iota(int a, TimeSpan b, double c, long d, Eta e) {
             this.A = a;
@@ -288,6 +289,10 @@ namespace Prototypes {
             this.C = c;
             this.D = d;
             this.E = e;
+        }
+
+        public class NestedClass {
+            public string A { get; set; }
         }
     }
 

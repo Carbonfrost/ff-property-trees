@@ -45,5 +45,16 @@ namespace Tests {
             var ns = TypeHelper.GetNamespaceName(typeof(ICollection<KeyValuePair<string, PropertyTree>>));
             Assert.That(ns, Is.EqualTo(Xmlns.PropertyTrees2010));
         }
+
+        [Test]
+        public void IsParameterRequired_should_be_true_on_value_types() {
+            Assert.True(TypeHelper.IsParameterRequired(typeof(bool)));
+            Assert.False(TypeHelper.IsParameterRequired(typeof(Uri)));
+        }
+
+        [Test]
+        public void IsParameterType_should_be_false_on_nullables() {
+            Assert.False(TypeHelper.IsParameterRequired(typeof(bool?)));
+        }
     }
 }

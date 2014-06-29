@@ -107,7 +107,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
 
         public override string Name {
             get {
-                return type.Name;
+                return type.Name.Replace('`', '-');
             }
         }
 

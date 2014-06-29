@@ -72,9 +72,9 @@ namespace Tests {
 
             var ex = ExpectPropertyTreeException(() => pt.Bind<Eta>());
 
+            Assert.That(ex.Message, Is.StringMatching(@"required properties .+d \(https://ns.example.com/\) \(Prototypes.Eta\)"));
             Assert.That(ex.FileLocation.LineNumber, Is.EqualTo(4));
             Assert.That(ex.FileLocation.LinePosition, Is.EqualTo(2));
-            Assert.That(ex.Message, Is.StringMatching(@"required properties .+d \(https://ns.example.com/\) \(Prototypes.Eta\)"));
         }
 
 

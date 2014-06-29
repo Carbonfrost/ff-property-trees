@@ -42,10 +42,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 return target;
             }
 
-            public override PropertyTreeMetaObject EndStep(PropertyTreeMetaObject target) {
-                return target;
-            }
-
         }
     }
 

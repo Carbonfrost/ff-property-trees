@@ -92,7 +92,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
             if (string.Equals(x.LocalName, y.LocalName, StringComparison.OrdinalIgnoreCase))
                 return x.Namespace == y.Namespace
-                    || (definition.BaseTypes.Any(m => m.Namespace != null && m.Namespace == y.Namespace));
+                    || (definition.GetSerializationCandidateNamespaces().Any(m => m == y.Namespace));
             else
                 return false;
         }
