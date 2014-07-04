@@ -19,7 +19,7 @@
 
 -->
 <build
-  xmlns="http://ns.carbonfrost.com/2013/commons/build/"
+  xmlns="http://ns.carbonfrost.com/commons/build"
   defaultTarget="release">
   <targets>
 
@@ -44,7 +44,7 @@
         <versionAttributeGenerator></versionAttributeGenerator>
       </file>      
       
-      <assembly 
+      <assembly
         privateKey="F5NonCommercial.snk"
         target="bin/net40/debug/x86/Carbonfrost.Commons.PropertyTrees.dll">
         <runtime version="4.5.1" />
