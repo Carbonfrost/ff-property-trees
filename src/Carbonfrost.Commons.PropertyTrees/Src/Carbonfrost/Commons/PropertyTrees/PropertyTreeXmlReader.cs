@@ -22,12 +22,13 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
+using Carbonfrost.Commons.Shared.Runtime;
 using Carbonfrost.Commons.PropertyTrees.Schema;
 using XReadState = System.Xml.ReadState;
 
 namespace Carbonfrost.Commons.PropertyTrees {
 
-    public partial class PropertyTreeXmlReader : PropertyTreeReader, IXmlLineInfo, IXmlNamespaceResolver {
+    public partial class PropertyTreeXmlReader : PropertyTreeReader, IXmlLineInfo, IXmlNamespaceResolver, IUriContext {
 
         private readonly XmlReader reader;
         private PTXReaderState state;
@@ -42,6 +43,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
             public string _value;
             public int _position;
             public bool _express;
+            public Uri _baseUri;
 
             public IDictionary<string, string> prefixMap;
 
@@ -162,6 +164,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
             result._express = reader.Prefix.Length > 0;
             result.LineNumber = readerLineInfoCache.LineNumber;
             result.LinePosition = readerLineInfoCache.LinePosition;
+            result._baseUri = new Uri(reader.BaseURI, UriKind.RelativeOrAbsolute);
 
             int position = 0;
             if (data.Count > 0) {
@@ -236,6 +239,16 @@ namespace Carbonfrost.Commons.PropertyTrees {
             get {
                 Moved();
                 throw new NotImplementedException();
+            }
+        }
+
+        // `IUriContext' implementation
+        public Uri BaseUri {
+            get {
+                return Peek()._baseUri;
+            }
+            set {
+
             }
         }
 

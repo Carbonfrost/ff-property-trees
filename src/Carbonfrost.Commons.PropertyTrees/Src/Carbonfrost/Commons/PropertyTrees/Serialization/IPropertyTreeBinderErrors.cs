@@ -27,8 +27,9 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
     interface IPropertyTreeBinderErrors {
 
         void BadAddChild(Type parentType, Exception ex, FileLocation loc);
+        void FailedToLoadFromSource(Uri uri, Exception ex, FileLocation fileLocation);
         void CouldNotBindStreamingSource(Type componentType, FileLocation loc);
-		void CouldNotBindGenericParameters(Type componentType, Exception ex, FileLocation loc);
+        void CouldNotBindGenericParameters(Type componentType, Exception ex, FileLocation loc);
 
         void DuplicatePropertyName(IEnumerable<QualifiedName> duplicates,
                                    FileLocation loc);

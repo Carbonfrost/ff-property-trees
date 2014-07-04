@@ -1,5 +1,5 @@
-﻿<?xml version="1.0"?>
-<delta>
+<?xml version="1.0"?>
+<delta xmlns="https://ns.example.com/">
     <a>
         <add
             a  = "true"
@@ -20,7 +20,12 @@
     <b>
         <add>
             <a f  = "10.5000"
-               g  = "10.5" />
+               g  = "10.5"
+               u  = ":Phi"            />
         </add>
     </b>
+    <c>
+        <add
+            m  = "Carbonfrost F5 Project"></add>
+    </c>
 </delta>

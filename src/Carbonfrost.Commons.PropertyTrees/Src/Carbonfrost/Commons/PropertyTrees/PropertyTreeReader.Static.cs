@@ -29,13 +29,6 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
     partial class PropertyTreeReader {
 
-        static readonly Func<Stream, Encoding, PropertyTreeReaderSettings, PropertyTreeReader>[] CREATE = {
-            (s, e, settings) => (PropertyTreeReader.CreateXml(s, e, new PropertyTreeXmlReaderSettings(settings))), // Unknown
-            (s, e, settings) => (PropertyTreeReader.CreateXml(s, e, new PropertyTreeXmlReaderSettings(settings))), // Xml
-            (s, e, settings) => { throw PropertyTreesFailure.BinaryNotSupported(); }, // Binary
-            (s, e, settings) => (PropertyTreeReader.CreateXml(new GZipStream(s, CompressionMode.Decompress), e, new PropertyTreeXmlReaderSettings(settings))), // XmlGzip
-        };
-
         public static PropertyTreeReader FromObject(object value,
                                                     PropertyTreeReaderSettings settings = null) {
             return new PropertyTreeObjectReader(value);
@@ -45,7 +38,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
                                                 Encoding encoding = null,
                                                 PropertyTreeReaderSettings settings = null) {
             Require.NotNullOrEmptyString("fileName", fileName);
-            return GetFactoryFunc(fileName)(File.OpenRead(fileName), encoding, settings);
+            return GetFactoryFunc(fileName)(StreamContext.FromFile(fileName), encoding, settings);
         }
 
         public static PropertyTreeReader Create(StreamContext streamContext,
@@ -59,9 +52,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
                 lp = streamContext.Uri.LocalPath;
             }
 
-            return GetFactoryFunc(lp)(streamContext.OpenRead(),
-                                      encoding,
-                                      settings);
+            var result = GetFactoryFunc(lp)(streamContext,
+                                            encoding,
+                                            settings);
+            return result;
         }
 
         public static PropertyTreeReader Create(Stream stream,
@@ -124,8 +118,8 @@ namespace Carbonfrost.Commons.PropertyTrees {
             return new PropertyTreeXmlReader(xr);
         }
 
-        static Func<Stream, Encoding, PropertyTreeReaderSettings, PropertyTreeReader> GetFactoryFunc(string lp) {
-            return CREATE[(int) Utility.InferFlavor(lp)];
+        static Func<StreamContext, Encoding, PropertyTreeReaderSettings, PropertyTreeReader> GetFactoryFunc(string lp) {
+            return (s, e, settings) => (PropertyTreeReader.CreateXml(s, e, new PropertyTreeXmlReaderSettings(settings)));
         }
     }
 

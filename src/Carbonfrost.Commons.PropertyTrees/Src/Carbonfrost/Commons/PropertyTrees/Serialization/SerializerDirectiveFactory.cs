@@ -104,12 +104,14 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             }
         }
 
-        public TargetSourceDirective CreateTargetSource(PropertyTreeNavigator nav) {
+        public TargetSourceDirective CreateTargetSource(PropertyTreeNavigator nav, IUriContext uriContext) {
             if (nav.IsProperty) {
 
                 Exception error;
                 try {
                     Uri uri = new Uri(nav.Value.ToString(), UriKind.RelativeOrAbsolute);
+                    uri = Utility.CombineUri(uriContext, uri);
+
                     return new TargetSourceDirective(uri);
 
                 } catch (ArgumentException e) {
@@ -123,9 +125,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             }
 
             else {
-
-                // TODO Bind criteria form for target source directive
-                throw new NotImplementedException();
+                return nav.Bind<TargetSourceDirective>();
             }
         }
 

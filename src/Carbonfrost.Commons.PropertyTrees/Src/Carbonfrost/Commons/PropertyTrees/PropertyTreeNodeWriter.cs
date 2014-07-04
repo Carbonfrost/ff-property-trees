@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Carbonfrost.Commons.Shared;
+using Carbonfrost.Commons.Shared.Runtime;
 
 namespace Carbonfrost.Commons.PropertyTrees {
 
@@ -36,6 +37,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
         private PropertyNode currentParent;
         private PropertyTree root;
         private PropertyBuilder property;
+        private IUriContext uriContext;
         private bool started;
         private IXmlLineInfo lineInfo;
         private IDictionary<string, string> prefixMap;
@@ -148,9 +150,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
             this.isExpressNamespace = isExpressNamespace;
         }
 
-        internal override void SetLineInfo(IXmlLineInfo lineInfo, IDictionary<string, string> prefixMap) {
+        internal override void SetLineInfo(IXmlLineInfo lineInfo, IDictionary<string, string> prefixMap, IUriContext uriContext) {
             this.lineInfo = lineInfo;
             this.prefixMap = prefixMap;
+            this.uriContext = uriContext;
         }
 
         private void StartImplicitly() {
@@ -172,12 +175,7 @@ namespace Carbonfrost.Commons.PropertyTrees {
         }
 
         private void CopyLineInfo(PropertyNode node) {
-            if (lineInfo != null) {
-                node.LinePosition = lineInfo.LinePosition;
-                node.LineNumber = lineInfo.LineNumber;
-            }
-            node.prefixMap = this.prefixMap;
-            node.isExpressNamespace = this.isExpressNamespace;
+            node.InitFrom(lineInfo, uriContext, prefixMap, isExpressNamespace);
         }
     }
 }

@@ -25,6 +25,17 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
         private readonly Uri source;
 
+        public Uri Uri {
+            get {
+                return source;
+            }
+        }
+
+        // TODO Consider criteria
+
+        public ContentType Type { get; set; }
+        public string Provider { get; set; }
+
         public StreamContext GetStreamingContext() {
             return StreamContext.FromSource(source);
         }

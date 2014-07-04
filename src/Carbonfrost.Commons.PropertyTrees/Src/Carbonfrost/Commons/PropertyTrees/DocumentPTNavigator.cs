@@ -28,12 +28,20 @@ using Carbonfrost.Commons.Shared.Runtime;
 
 namespace Carbonfrost.Commons.PropertyTrees {
 
-    sealed class DocumentPTNavigator : PropertyTreeNavigator, IXmlNamespaceResolver {
+    sealed class DocumentPTNavigator : PropertyTreeNavigator, IXmlNamespaceResolver, IUriContext {
 
         private PropertyNode current;
 
         public DocumentPTNavigator(PropertyNode current) {
             this.current = current;
+        }
+
+        public Uri BaseUri {
+            get {
+                return current.BaseUri;
+            }
+            set {
+            }
         }
 
         public override int Position {

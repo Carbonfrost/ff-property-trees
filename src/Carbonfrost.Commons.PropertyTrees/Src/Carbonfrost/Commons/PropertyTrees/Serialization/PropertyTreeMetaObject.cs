@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Carbonfrost.Commons.ComponentModel;
 using Carbonfrost.Commons.Shared;
 using Carbonfrost.Commons.Shared.Runtime;
@@ -249,7 +250,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             // Apply concrete classes
             var cp = neededType.GetConcreteClass() ?? neededType;
             var conv = TypeHelper.GetConverter(property, cp);
-            result = conv.ConvertFrom(value);
+            result = conv.ConvertFrom(context, Thread.CurrentThread.CurrentCulture, value);
             return true;
         }
 

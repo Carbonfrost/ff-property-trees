@@ -31,8 +31,8 @@ namespace Carbonfrost.Commons.PropertyTrees {
         : IHierarchyObject, ICloneable, INotifyPropertyChanged, IHierarchyNavigable, IPropertyNode {
 
         internal PropertyTree parent;
-        internal IDictionary<string, string> prefixMap;
-        internal bool isExpressNamespace;
+        private IDictionary<string, string> prefixMap;
+        private bool isExpressNamespace;
 
         public abstract PropertyNodeCollection Children { get; }
 
@@ -54,6 +54,11 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         public PropertyNode PreviousSibling { get; internal set; }
         public PropertyNode NextSibling { get; internal set; }
+
+        public Uri BaseUri {
+            get;
+            set;
+        }
 
         public PropertyNode FirstSibling {
             get {
@@ -457,5 +462,20 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         public abstract void CopyTo(PropertyNode node);
 
+        internal void InitFrom(IXmlLineInfo lineInfo,
+                               IUriContext uriContext,
+                               IDictionary<string, string> prefixMap,
+                               bool isExpressNamespace)
+        {
+            if (lineInfo != null) {
+                LinePosition = lineInfo.LinePosition;
+                LineNumber = lineInfo.LineNumber;
+            }
+            if (uriContext != null) {
+                BaseUri = uriContext.BaseUri;
+            }
+            this.prefixMap = prefixMap;
+            this.isExpressNamespace = isExpressNamespace;
+        }
     }
 }

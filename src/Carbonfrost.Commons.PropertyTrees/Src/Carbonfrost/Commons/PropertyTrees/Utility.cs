@@ -57,21 +57,6 @@ namespace Carbonfrost.Commons.PropertyTrees {
             }
         }
 
-        public static PropertyTreeFlavor InferFlavor(string file) {
-            string ext = Path.GetExtension(file);
-            if (string.IsNullOrEmpty(ext))
-                return PropertyTreeFlavor.Unknown;
-
-            switch (ext.ToLowerInvariant()) {
-                case ".pt":
-                case ".ptx":
-                case ".xml":
-                    return PropertyTreeFlavor.Xml;
-                default:
-                    return PropertyTreeFlavor.Unknown;
-            }
-        }
-
         public static bool IsProperty(object value) {
             switch (Type.GetTypeCode(value.GetType())) {
                 case TypeCode.Boolean:
@@ -210,6 +195,19 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
             var nn = type.GetQualifiedName();
             return nn.Namespace;
+        }
+
+        public static Uri CombineUri(IUriContext uriContext, Uri uri) {
+            if (!uri.IsAbsoluteUri) {
+                if (uriContext != null && uriContext.BaseUri != null) {
+                    var buri = uriContext.BaseUri;
+                    if (!buri.IsAbsoluteUri) {
+                        buri = new Uri("file://" + Environment.CurrentDirectory);
+                    }
+                    uri = new Uri(buri, uri);
+                }
+            }
+            return uri;
         }
     }
 }

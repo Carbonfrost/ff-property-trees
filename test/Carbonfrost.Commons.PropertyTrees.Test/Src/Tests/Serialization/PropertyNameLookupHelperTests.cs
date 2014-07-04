@@ -44,6 +44,21 @@ namespace Tests.Serialization {
         }
 
         [Test]
+        public void FindOperator_should_implicitly_handle_inherited_operator_names_alternate() {
+            var unit = new PropertyNameLookupHelper();
+            var comp = PropertyTreeDefinition.FromType(typeof(AlphaList));
+
+            // Though add is defined inside default NS, it is accessible via the NS of the type
+            var qn = QualifiedName.Create(comp.Namespace, "alpha");
+            var result = unit.FindOperator(comp, typeof(AlphaList), qn);
+            Assert.That(result, Is.Not.Null);
+
+            qn = QualifiedName.Create(comp.Namespace, "add");
+            result = unit.FindOperator(comp, typeof(AlphaList), qn);
+            Assert.That(result, Is.Not.Null);
+        }
+
+        [Test]
         public void FindOperator_should_implicitly_handle_inherited_operator_names_constructed_generics() {
             var unit = new PropertyNameLookupHelper();
             var comp = PropertyTreeDefinition.FromType(typeof(Collection<Control>));

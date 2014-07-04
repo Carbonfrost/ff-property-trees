@@ -74,15 +74,16 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 var component = target.Component;
                 PropertyTreeMetaObject propertyTarget = target.CreateChild(property, navigator.QualifiedName, ancestorMeta);
 
-                var services = ServiceProvider.Compose(
-                    new PropertyBindContext(component, property)
-                    {
-                        LineNumber = navigator.LineNumber,
-                        LinePosition = navigator.LinePosition,
-                    },
-                    parent);
+                var services = new PropertyBindContext(
+                    component,
+                    property,
+                    ServiceProvider.Compose(ServiceProvider.FromValue(navigator), parent))
+                {
+                    LineNumber = navigator.LineNumber,
+                    LinePosition = navigator.LinePosition,
+                };
 
-                propertyTarget = navigator.TopLevelBind(propertyTarget, services);
+                propertyTarget = parent.Bind(propertyTarget, navigator, services);
                 target.BindSetMember(property, navigator.QualifiedName, propertyTarget, ancestorMeta, services);
             }
 
@@ -90,11 +91,13 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
                 private readonly object component;
                 private readonly PropertyDefinition property;
+                private readonly IServiceProvider serviceProvider;
 
-                public PropertyBindContext(object component, PropertyDefinition property)
+                public PropertyBindContext(object component, PropertyDefinition property, IServiceProvider serviceProvider)
                 {
                     this.property = property;
                     this.component = component;
+                    this.serviceProvider = serviceProvider;
                 }
 
                 public bool HasLineInfo() {
@@ -138,7 +141,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     if (typeof(IXmlLineInfo).Equals(serviceType))
                         return this;
 
-                    return null;
+                    return serviceProvider.GetService(serviceType);
                 }
             }
 

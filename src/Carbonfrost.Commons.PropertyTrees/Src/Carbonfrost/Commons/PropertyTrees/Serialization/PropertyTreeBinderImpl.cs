@@ -44,7 +44,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     new ProcessPropertiesStep(false),
                     new ProcessOperatorsStep(),
                     new ProcessPropertiesStep(true)
-                ),
+                   ),
             new ErrorUnmatchedMembersStep(),
             new EndObjectStep(),
         };
@@ -138,8 +138,9 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
             if (navigator.IsProperty) {
                 string value = Convert.ToString(navigator.Value);
+                var sp = ServiceProvider.Compose(ServiceProvider.FromValue(navigator), serviceProvider, this);
+                var xml = (IXmlNamespaceResolver) sp.GetService(typeof(IXmlNamespaceResolver));
                 try {
-                    var sp = ServiceProvider.Compose(ServiceProvider.FromValue(navigator), serviceProvider, this);
                     return target.BindInitializeValue(value, sp);
 
                 } catch (Exception ex) {

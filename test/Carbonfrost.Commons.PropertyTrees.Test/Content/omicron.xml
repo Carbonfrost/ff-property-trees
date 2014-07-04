@@ -1,5 +1,5 @@
-﻿<?xml version="1.0"?>
-<omicron>
+<?xml version="1.0"?>
+<omicron xmlns="https://ns.example.com/">
     <alpha
         a  = "true"
         aa = ""
@@ -7,14 +7,15 @@
         bb = "0"
         d  = "g"
         e  = "3/30/2011 1:50 AM" />
-    
+
     <beta
         c  = "http://carbonfrost.com"
         d  = "Generic text">
         <a
-            a  = "true" />
+            a  = "true"
+            u  = ":Delta"        />
     </beta>
 
-    <gamma 
+    <gamma
         a = "en-US" />
 </omicron>

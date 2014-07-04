@@ -18,6 +18,7 @@
 
 using System;
 using System.Linq;
+using Carbonfrost.Commons.Shared.Runtime;
 
 namespace Carbonfrost.Commons.PropertyTrees.Serialization {
 
@@ -31,10 +32,19 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 var node = children.FindAndRemove(predicate).FirstOrDefault();
                 if (node != null) {
                     IServiceProvider serviceProvider = Parent.GetBasicServices(node);
-                    var ss = this.DirectiveFactory.CreateTargetSource(node);
+                    var uriContext = node as IUriContext;
+                    TargetSourceDirective ss;
+                    ss = this.DirectiveFactory.CreateTargetSource(node, uriContext);
 
                     if (ss != null) {
-                        target = target.BindStreamingSource(ss, serviceProvider);
+                        try {
+                            target = target.BindStreamingSource(ss, serviceProvider);
+                        } catch (Exception ex) {
+                            if (ex.IsCriticalException())
+                                throw;
+
+                            Parent.errors.FailedToLoadFromSource(ss.Uri, ex, node.FileLocation);
+                        }
                     }
                 }
 

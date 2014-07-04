@@ -74,7 +74,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     // and/or corresponding property descriptor?
 
                     var childContext = target.CreateChild(p.PropertyType);
-                    args[p.Name] = nav.TopLevelBind(childContext, serviceProvider);
+                    args[p.Name] = Bind(childContext, nav, serviceProvider);
                     children.Remove(nav);
                 }
                 else if (p.IsOptional) {

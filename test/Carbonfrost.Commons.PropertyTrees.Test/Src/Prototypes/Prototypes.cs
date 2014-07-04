@@ -241,14 +241,18 @@ namespace Prototypes {
     public class Delta {
 
         public IList<Alpha> A { get; private set; }
-        public IList<Beta> B { get; private set; }
+        public BetaList B { get; private set; }
+        public AlphaList C { get; private set; }
 
         public Delta() {
             this.A = new List<Alpha>();
-            this.B = new List<Beta>();
+            this.B = new BetaList();
+            this.C = new AlphaList();
         }
 
     }
+
+    public class AlphaList : List<Alpha> {}
 
     public class Eta {
 

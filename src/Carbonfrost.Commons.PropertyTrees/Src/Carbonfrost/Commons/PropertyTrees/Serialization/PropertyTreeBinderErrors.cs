@@ -33,6 +33,10 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             throw PropertyTreesFailure.BadAddChild(parentType, ex, loc);
         }
 
+        public void FailedToLoadFromSource(Uri uri, Exception ex, FileLocation loc) {
+            throw PropertyTreesFailure.FailedToLoadFromSource(uri, ex, loc);
+        }
+
         public void CouldNotBindGenericParameters(Type componentType, Exception ex, FileLocation loc) {
             throw PropertyTreesFailure.CouldNotBindGenericParameters(componentType, ex, loc);
         }

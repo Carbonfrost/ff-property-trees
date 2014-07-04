@@ -298,6 +298,9 @@ namespace Tests {
 
             Assert.That(d.B[0].A.F, Is.EqualTo(10.5000m));
             Assert.That(d.B[0].A.G, Is.EqualTo(10.5));
+
+            // <add> is inherited, but still binds
+            Assert.That(d.C[0].M, Is.EqualTo("Carbonfrost F5 Project"));
         }
 
         [Test]
@@ -554,6 +557,16 @@ namespace Tests {
             Assert.That(() => pt.Bind<Iota>(), Throws.InstanceOf<PropertyTreeException>()
                         .And.Message.StringMatching("line 3, pos 2"));
         }
-    }
 
+        [Test]
+        public void bind_should_resolve_relative_source_url() {
+            PropertyTreeReader pt = LoadContent("beta-7.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var a = pt.Bind<Beta>().H;
+            Assert.That(a.D, Is.EqualTo('g'));
+            Assert.That(a.E, Is.EqualTo(DateTime.Parse("3/30/2011 1:50 AM")));
+
+        }
+    }
 }

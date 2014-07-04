@@ -56,7 +56,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
         }
 
         public override PropertyTreeMetaObject BindStreamingSource(StreamContext input, IServiceProvider serviceProvider) {
-            var ss = StreamingSource.Create(this.ComponentType);
+            var ss = StreamingSource.Create(this.ComponentType) ?? new PropertyTreeSource();
 
             if (ss == null) {
                 var errors = serviceProvider.TryGetService(PropertyTreeBinderErrors.Default);

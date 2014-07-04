@@ -26,14 +26,6 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
     partial class PropertyTreeWriter {
 
-         static readonly Func<Stream, Encoding, PropertyTreeWriterSettings, PropertyTreeWriter>[] CREATE = {
-            (s, e, settings) => (PropertyTreeWriter.CreateXml(s, e, new PropertyTreeWriterSettings(settings))), // Unknown
-            (s, e, settings) => (PropertyTreeWriter.CreateXml(s, e, new PropertyTreeWriterSettings(settings))), // Xml
-            (s, e, settings) => { throw PropertyTreesFailure.BinaryNotSupported(); }, // Binary
-            (s, e, settings) => (PropertyTreeWriter.CreateXml(new GZipStream(s, CompressionMode.Decompress), e, new PropertyTreeWriterSettings(settings))), // XmlGzip
-        };
-
-
         public static PropertyTreeXmlWriter CreateXml(XmlWriter xmlWriter, PropertyTreeWriterSettings settings = null) {
             if (xmlWriter == null)
                 throw new ArgumentNullException("xmlWriter"); // $NON-NLS-1

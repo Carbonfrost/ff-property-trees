@@ -40,10 +40,6 @@ namespace Carbonfrost.Commons.PropertyTrees {
             return Failure.Prepare(new InvalidOperationException(SR.InvalidFactoryType(fullName)));
         }
 
-        public static NotImplementedException BinaryNotSupported() {
-            return Failure.Prepare(new NotImplementedException(SR.BinaryNotSupported()));
-        }
-
         public static PropertyTreeException ReaderWrongPosition(PropertyNodeType expect, PropertyNodeType actual) {
             return Failure.Prepare(new PropertyTreeException(SR.ReaderWrongPosition(expect, actual)));
         }
@@ -199,6 +195,10 @@ namespace Carbonfrost.Commons.PropertyTrees {
 
         public static InvalidOperationException UnableToMatchTypeNameZero(string name) {
             return Failure.Prepare(new InvalidOperationException(SR.UnableToMatchTypeNameZero(name)));
+        }
+
+        public static PropertyTreeException FailedToLoadFromSource(Uri uri, Exception ex, FileLocation loc) {
+            return Failure.Prepare(new PropertyTreeException(SR.FailedToLoadFromSource(uri), ex, loc));
         }
     }
 

@@ -48,7 +48,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     // TODO Use service activation (we have the output type)
 
                     var item = target.CreateChild(itemType);
-                    var model = navigator.TopLevelBind(item, null);
+                    var model = parent.Bind(item, navigator, null);
                     var args = new Dictionary<string, PropertyTreeMetaObject>
                     {
                         { addon.DefaultParameter.Name, model }

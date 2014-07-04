@@ -113,7 +113,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Schema {
                             }));
                 }
 
-            return result.Where(t => t != null);
+            return result.Where(t => t != null).Distinct();
         }
     }
 }
