@@ -41,7 +41,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                     target.BindTargetProvider(name, null, serviceProvider);
                 }
 
-                if (target.Component == null && target.IsLateBound) {
+                if (target.Component == null && !target.ComponentType.IsSealed) {
                     // TODO This predicate is probably too loose
                     Predicate<PropertyTreeNavigator> predicate = t => t.Name == "type";
                     var node = children.FindAndRemove(predicate).FirstOrDefault();

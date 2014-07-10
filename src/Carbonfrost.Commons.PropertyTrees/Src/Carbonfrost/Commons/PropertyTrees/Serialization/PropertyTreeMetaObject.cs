@@ -79,12 +79,6 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             private set;
         }
 
-        internal bool IsLateBound {
-            get {
-                return typeof(IObjectWithType).IsAssignableFrom(ComponentType);
-            }
-        }
-
         protected PropertyTreeMetaObject() {}
 
         protected PropertyTreeMetaObject(PropertyTreeMetaObject parent) {

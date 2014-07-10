@@ -43,7 +43,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 Exception error;
 
                 try {
-                    var tr = TypeReference.Parse(Convert.ToString(nav.Value));
+                    var tr = TypeReference.Parse(Convert.ToString(nav.Value), parent.GetBasicServices(nav));
                     return new TargetTypeDirective(tr, null);
 
                 } catch (Exception ex) {

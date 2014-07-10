@@ -199,6 +199,21 @@ namespace Tests {
         }
 
         [Test]
+        public void bind_abstract_builder_types_xmlns_lookup_and_builder() {
+            // Checks that xmlns prefixes can be expanded and that the builder is used
+            PropertyTreeReader pt = LoadContent("epsilon-chi-builder-2.xml");
+            Assume.That(pt.Read(), Is.True);
+
+            var tup = pt.Bind<Tuple<EpsilonChi, Upsilon>>();
+            EpsilonChi e = tup.Item1;
+            Upsilon u = tup.Item2;
+            Assert.That(e, Is.InstanceOf<EpsilonChiAlpha>());
+            Assert.That(((EpsilonChiAlpha) e)._M, Is.EqualTo('q'));
+
+            Assert.That(((EpsilonChiAlpha) u.C)._M, Is.EqualTo('r'));
+        }
+
+        [Test]
         public void bind_builder_types() {
             // Demonstrates that the builder indirection can be used
 

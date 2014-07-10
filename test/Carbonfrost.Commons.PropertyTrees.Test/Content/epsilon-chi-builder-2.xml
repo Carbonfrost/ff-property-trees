@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<tuple xmlns:ex = "https://ns.example.com/">
+    <item1
+           type     = "ex:EpsilonChiAlpha"
+           m        = "q">
+    </item1>
+    <item2>
+        <c type     = "ex:EpsilonChiAlpha"
+           m        = "r" />
+    </item2>
+</tuple>

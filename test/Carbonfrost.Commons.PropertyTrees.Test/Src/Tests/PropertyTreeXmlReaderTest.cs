@@ -18,8 +18,10 @@
 
 using System;
 using System.Linq;
+using System.Xml;
 using Carbonfrost.Commons.PropertyTrees;
 using NUnit.Framework;
+using ReadState = Carbonfrost.Commons.PropertyTrees.ReadState;
 
 namespace Tests {
 
@@ -133,6 +135,26 @@ namespace Tests {
             Assert.That(reader.Read());
             PropertyTree tree = reader.ReadPropertyTree();
             AssertBetaFile(tree);
+        }
+
+        [Test]
+        public void ReadPropertyTree_should_retain_prefix_map_in_nodes() {
+            PropertyTreeReader reader = PropertyTreeReader.CreateXml(GetXmlReader("alpha.xml"));
+            Assert.That(reader.Read());
+            Assert.That(reader.Read());
+            Assert.That(reader.Read());
+
+            // The tree created here should also support ns resolving
+            PropertyTree tree = PropertyTreeReader.CreateXml(GetXmlReader("alpha.xml")).ReadPropertyTree();
+            var nav = tree.CreateNavigator();
+            var resolver = (IXmlNamespaceResolver) nav;
+
+            nav.MoveToFirstChild();
+            Assert.That(nav.Name, Is.EqualTo("a"));
+            Assert.That(resolver.LookupNamespace("shared"),
+                        Is.EqualTo("http://ns.carbonfrost.com/commons/sharedruntime"));
+            Assert.That(resolver.LookupNamespace(string.Empty),
+                        Is.EqualTo(null));
         }
 
         private void AssertBetaFile(PropertyTree tree) {

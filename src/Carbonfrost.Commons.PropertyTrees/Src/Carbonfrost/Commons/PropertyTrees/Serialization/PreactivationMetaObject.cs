@@ -120,17 +120,14 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
             if (newType == null) {
                 ProbeRuntimeComponents();
 
-                newType = type.TryResolve();
-                if (newType == null) {
-                    throw new NotImplementedException();
-                }
+                newType = type.Resolve();
             }
 
             if (this.componentType.IsAssignableFrom(newType)) {
                 this.componentType = newType;
 
             } else {
-                throw new NotImplementedException();
+                throw Failure.NotAssignableFrom(newType, this.componentType);
             }
 
         }

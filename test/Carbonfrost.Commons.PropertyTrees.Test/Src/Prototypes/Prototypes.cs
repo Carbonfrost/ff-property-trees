@@ -395,6 +395,7 @@ namespace Prototypes {
 
         public int A { get; set; }
         public string B { get; set; }
+        public EpsilonChi C { get; set; }
 
         public Upsilon(string b, int a = 45) {
             this.A = a;
@@ -547,10 +548,20 @@ namespace Prototypes {
     }
 
     public class EpsilonChiAlphaBuilder : Builder<EpsilonChiAlpha> {
+
+        public char M { get; set; }
+
+        public override EpsilonChiAlpha Build(IServiceProvider serviceProvider = null) {
+            var result = base.Build(serviceProvider);
+            result._M = M;
+
+            return result;
+        }
     }
 
     [Builder(typeof(EpsilonChiAlphaBuilder))]
     public class EpsilonChiAlpha : EpsilonChi {
+        public char _M { get; set; }
     }
 
     // TODO Demonstrates the use of service activation using tau

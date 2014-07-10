@@ -33,7 +33,7 @@ namespace Carbonfrost.Commons.PropertyTrees.Serialization {
                 Type type = target.ComponentType ?? typeof(object);
 
                 // Select providers
-                if (target.IsLateBound || type.IsProviderType()) {
+                if (type.IsProviderType()) {
                     var node = children.FindAndRemove(ImplicitDirective(target, "provider")).FirstOrDefault();
 
                     if (node != null) {
